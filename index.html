@@ -347,7 +347,7 @@
 
 <body>
     <div id="setup-app" class="app hidden" style="text-align:center; padding-top:40px;">
-        <div class="logo" style="margin-bottom:30px;">GYST <span style="font-size:15px; color:var(--t2); margin-left:4px; font-weight:500;">money<em>Flow</em></span></div>
+        <div class="logo" style="margin-bottom:30px; line-height:1.2;">GYST<br><span style="font-size:15px; color:var(--t2); font-weight:500;">money<em>Flow</em></span></div>
         <h2 style="font-size:18px; margin-bottom:12px; font-weight:700; color:var(--t1);">Ready to get your shit together?</h2>
         <p style="font-size:13px; color:var(--t2); margin-bottom:28px; line-height:1.6; padding:0 10px;">
             No aesthetic templates. No guilt trips. Just log your transactions and move on.<br><br>
@@ -358,17 +358,15 @@
     </div>
 
     <div id="load-app" class="app hidden" style="text-align:center; padding-top:60px;">
-        <div class="logo" style="margin-bottom:10px;">GYST <span style="font-size:15px; color:var(--t2); margin-left:4px; font-weight:500;">money<em>Flow</em></span></div>
+        <div class="logo" style="margin-bottom:10px; line-height:1.2;">GYST<br><span style="font-size:15px; color:var(--t2); font-weight:500;">money<em>Flow</em></span></div>
         <p style="font-size:12px; color:var(--t2);">Connecting...</p>
     </div>
 
     <div id="main-app" class="app hidden">
-        <div class="hdr">
-            <div style="display:flex; align-items:baseline; gap:12px;">
-                <div id="settings-btn" style="font-size:11px; color:var(--t3); cursor:pointer; font-family:'DM Mono', monospace; letter-spacing:0.05em; text-transform:uppercase;" title="Update API URL">RESET</div>
-                <div class="logo">GYST <span style="font-size:15px; color:var(--t2); margin-left:4px; font-weight:500;">money<em>Flow</em></span></div>
-            </div>
-            <div id="toast"></div>
+        <div class="hdr" style="position:relative;">
+            <div class="logo">GYST <span style="font-size:15px; color:var(--t2); margin-left:4px; font-weight:500;">money<em id="flow-text" style="transition: color 0.3s;">Flow</em></span></div>
+            <div id="settings-btn" style="font-size:11px; color:var(--t3); cursor:pointer; font-family:'DM Mono', monospace; letter-spacing:0.05em; text-transform:uppercase;" title="Update API URL">RESET</div>
+            <div id="toast" style="position:absolute; top:55px; right:20px; text-align:right;"></div>
         </div>
 
         <div class="sec">
@@ -846,13 +844,24 @@
 
         let toastTimer;
         function toast(message, type) {
+            if (type === 'ok') {
+                const flowText = document.getElementById('flow-text');
+                if (flowText) {
+                    flowText.textContent = 'Flowed';
+                    flowText.style.color = 'var(--grn)';
+                    setTimeout(() => {
+                        flowText.textContent = 'Flow';
+                        flowText.style.color = '';
+                    }, 2500);
+                }
+                return;
+            }
+
             const el = document.getElementById('toast');
             el.textContent = message;
-            el.style.color = type === 'err' ? '#ff4444' : '#22c55e';
+            el.style.color = type === 'err' ? 'var(--red)' : 'var(--grn)';
             clearTimeout(toastTimer);
-            toastTimer = setTimeout(() => {
-                el.textContent = '';
-            }, 3500);
+            toastTimer = setTimeout(() => el.textContent = '', 3000);
         }
     </script>
 </body>
