@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <base target="_top">
+    <title>GYST</title>
+    
+    <!-- Premium PWA / Native App Meta Tags -->
+    <meta name="theme-color" content="#0a0a0a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="GYST">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="icon-192.png">
+
+    <!-- Open Graph (Link Previews) -->
+    <meta property="og:title" content="GYST">
+    <meta property="og:description" content="A personal finance system built for imperfect humans.">
+    <meta property="og:image" content="icon-512.png">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --bg: #0a0a0a;
+            --s1: #141414;
+            --s2: #1c1c1c;
+            --s3: #242424;
+            --b1: #2a2a2a;
+            --b2: #3a3a3a;
+            --b3: #505050;
+            --t1: #f0f0f0;
+            --t2: #888;
+            --t3: #444;
+            --red: #ff4444;
+            --redbg: #180808;
+            --grn: #22c55e;
+            --grnbg: #071510;
+            --blu: #3b82f6;
+            --blubg: #080e1a;
+            --r: 10px;
+            --rl: 14px;
+        }
+
+        html,
+        body {
+            background: var(--bg);
+            color: var(--t1);
+            font-family: Syne, sans-serif;
+            min-height: 100vh;
+            overscroll-behavior: none;
+        }
+
+        .app {
+            max-width: 440px;
+            margin: 0 auto;
+            padding: 0 0 60px;
+        }
+
+        .hdr {
+            padding: 24px 20px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .logo em {
+            color: var(--red);
+            font-style: normal;
+        }
+
+        #toast {
+            font-family: "DM Mono", monospace;
+            font-size: 11px;
+            color: var(--t2);
+            max-width: 210px;
+            text-align: right;
+            line-height: 1.35;
+            min-height: 16px;
+        }
+
+        .sec {
+            padding: 0 16px;
+            margin-bottom: 18px;
+        }
+
+        .lbl {
+            font-family: "DM Mono", monospace;
+            font-size: 9px;
+            font-weight: 500;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--t3);
+            margin-bottom: 8px;
+        }
+
+        .flow-row,
+        .acct-row,
+        .cat-row {
+            display: grid;
+            gap: 7px;
+        }
+
+        .flow-row {
+            grid-template-columns: repeat(3, 1fr);
+            gap: 8px;
+        }
+
+        .acct-row {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        .cat-row {
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        button {
+            font-family: Syne, sans-serif;
+            cursor: pointer;
+        }
+
+        .fb,
+        .ab,
+        .cb {
+            border-radius: var(--r);
+            border: 1.5px solid var(--b1);
+            background: var(--s1);
+            color: var(--t3);
+            font-weight: 700;
+            transition: border-color 0.12s, background 0.12s, color 0.12s, transform 0.1s;
+            text-align: center;
+        }
+
+        .fb:active,
+        .ab:active,
+        .cb:active,
+        .sc:active,
+        #sbtn:active {
+            transform: scale(0.96);
+        }
+
+        .fb {
+            padding: 13px 6px;
+            font-size: 12px;
+            letter-spacing: 0.03em;
+        }
+
+        .fb.sel-out {
+            background: var(--redbg);
+            border-color: var(--red);
+            color: var(--red);
+        }
+
+        .fb.sel-in {
+            background: var(--grnbg);
+            border-color: var(--grn);
+            color: var(--grn);
+        }
+
+        .fb.sel-tr {
+            background: var(--blubg);
+            border-color: var(--blu);
+            color: var(--blu);
+        }
+
+        .amt-box {
+            background: var(--s1);
+            border: 1.5px solid var(--b1);
+            border-radius: var(--rl);
+            padding: 14px 18px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: border-color 0.15s;
+        }
+
+        .amt-box:focus-within,
+        .ti:focus {
+            border-color: var(--b3);
+        }
+
+        .rp {
+            font-family: "DM Mono", monospace;
+            font-size: 24px;
+            color: var(--t3);
+            line-height: 1;
+            user-select: none;
+        }
+
+        #amount {
+            flex: 1;
+            background: transparent;
+            border: none;
+            outline: none;
+            font-family: "DM Mono", monospace;
+            font-size: 30px;
+            font-weight: 500;
+            color: var(--t1);
+            caret-color: var(--red);
+            min-width: 0;
+        }
+
+        #amount::placeholder,
+        .ti::placeholder {
+            color: var(--t3);
+        }
+
+        .ab {
+            min-height: 42px;
+            padding: 10px 4px;
+            font-size: 11px;
+            overflow-wrap: anywhere;
+        }
+
+        .cb {
+            min-height: 54px;
+            padding: 9px 4px;
+            font-size: 10px;
+            line-height: 1.2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            overflow-wrap: anywhere;
+        }
+
+        .cb .i {
+            font-size: 15px;
+            line-height: 1;
+            color: var(--t2);
+        }
+
+        .ab.on,
+        .cb.on {
+            background: var(--s3);
+            border-color: var(--b3);
+            color: var(--t1);
+            box-shadow: 0 0 0 1px var(--b2);
+        }
+
+        .ti {
+            width: 100%;
+            background: var(--s1);
+            border: 1.5px solid var(--b1);
+            border-radius: var(--r);
+            padding: 12px 14px;
+            font-family: "DM Mono", monospace;
+            font-size: 13px;
+            color: var(--t1);
+            outline: none;
+            transition: border-color 0.15s;
+        }
+
+        #sugg-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 8px;
+        }
+
+        .sc {
+            padding: 5px 11px;
+            border-radius: 20px;
+            border: 1.5px solid var(--b2);
+            background: var(--s2);
+            color: var(--t2);
+            font-family: "DM Mono", monospace;
+            font-size: 11px;
+            transition: all 0.12s;
+            white-space: nowrap;
+        }
+
+        .sc.picked {
+            background: var(--s3);
+            border-color: var(--b3);
+            color: var(--t1);
+        }
+
+        .div {
+            height: 1px;
+            background: var(--b1);
+            margin: 2px 16px 18px;
+        }
+
+        .sub-wrap {
+            padding: 0 16px;
+        }
+
+        #sbtn {
+            width: 100%;
+            min-height: 48px;
+            padding: 15px;
+            border-radius: var(--rl);
+            border: none;
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 0.05em;
+            transition: background 0.18s, transform 0.1s, opacity 0.15s;
+            color: #fff;
+            background: var(--red);
+        }
+
+        #sbtn:disabled {
+            opacity: 0.45;
+            cursor: wait;
+            transform: none;
+        }
+
+        #sbtn.c-in {
+            background: var(--grn);
+        }
+
+        #sbtn.c-tr {
+            background: var(--blu);
+        }
+
+        #sbtn.c-ok {
+            background: #15803d;
+        }
+
+        #sbtn.c-er {
+            background: #7f1d1d;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="setup-app" class="app hidden" style="text-align:center; padding-top:40px;">
+        <div class="logo" style="margin-bottom:30px;">GYST <span style="font-size:15px; color:var(--t2); margin-left:4px; font-weight:500;">money<em>Flow</em></span></div>
+        <h2 style="font-size:18px; margin-bottom:12px; font-weight:700; color:var(--t1);">Ready to get your shit together?</h2>
+        <p style="font-size:13px; color:var(--t2); margin-bottom:28px; line-height:1.6; padding:0 10px;">
+            No aesthetic templates. No guilt trips. Just log your transactions and move on.<br><br>
+            Paste your Web App URL below to connect.
+        </p>
+        <input type="text" id="api-url-input" class="ti" placeholder="Paste Web App URL here..." style="margin-bottom:16px; text-align:center;">
+        <button id="connect-btn" class="fb" style="width:100%; padding:15px; background:var(--red); color:#fff; border:none; font-size:14px; font-weight:700; letter-spacing:0.05em;">LINK DATABASE</button>
+    </div>
+
+    <div id="load-app" class="app hidden" style="text-align:center; padding-top:60px;">
+        <div class="logo" style="margin-bottom:10px;">GYST <span style="font-size:15px; color:var(--t2); margin-left:4px; font-weight:500;">money<em>Flow</em></span></div>
+        <p style="font-size:12px; color:var(--t2);">Connecting...</p>
+    </div>
+
+    <div id="main-app" class="app hidden">
+        <div class="hdr">
+            <div class="logo">GYST <span style="font-size:15px; color:var(--t2); margin-left:4px; font-weight:500;">money<em>Flow</em></span> <span id="settings-btn" style="font-size:14px; color:var(--t3); cursor:pointer; margin-left:8px;" title="Update API URL">⚙️</span></div>
+            <div id="toast"></div>
+        </div>
+
+        <div class="sec">
+            <div class="lbl">Flow Type</div>
+            <div class="flow-row" id="flow-grid"></div>
+        </div>
+
+        <div class="sec">
+            <div class="lbl">Amount</div>
+            <div class="amt-box">
+                <span class="rp">&#8377;</span>
+                <input type="number" id="amount" placeholder="0" inputmode="decimal" autocomplete="off">
+            </div>
+            <div id="qf-row" class="hidden" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;"></div>
+        </div>
+
+        <div class="sec">
+            <div class="lbl">Account</div>
+            <div class="acct-row" id="acct-grid"></div>
+        </div>
+
+        <div class="sec hidden" id="dest-sec">
+            <div class="lbl">Destination Account</div>
+            <div class="acct-row" id="dest-grid"></div>
+        </div>
+
+        <div class="sec" id="cat-sec">
+            <div class="lbl">Category</div>
+            <div class="cat-row" id="cat-grid"></div>
+        </div>
+
+        <div class="div"></div>
+
+        <div class="sec">
+            <div class="lbl">Description <span
+                    style="text-transform:none;letter-spacing:0;font-size:8px;color:#333">optional</span></div>
+            <div id="sugg-row" class="hidden"></div>
+            <input class="ti" type="text" id="desc" placeholder="Swiggy, Petrol, EMI, Salary..." autocomplete="off">
+        </div>
+
+        <div class="sec">
+            <div class="lbl">Person / Tag <span
+                    style="text-transform:none;letter-spacing:0;font-size:8px;color:#333">optional</span></div>
+            <input class="ti" type="text" id="tag" placeholder="Rahul, Work, Trip..." autocomplete="off">
+        </div>
+
+        <div class="sub-wrap">
+            <button id="sbtn" type="button">LOG ENTRY</button>
+        </div>
+    </div>
+
+    <script>
+        let CONFIG = null;
+        const SUGG_KEY = 'mf_sugg';
+        const PATTERN_KEY = 'mf_patterns';
+        const API_KEY_STORE = 'mf_api_url';
+        let API_URL = localStorage.getItem(API_KEY_STORE);
+        let initialized = false;
+
+        const ICONS = {
+            'Investments': 'INV',
+            'Transport': 'TRN',
+            'Utilities': 'UTL',
+            'Income': 'INC',
+            'Dining & Lifestyle': 'DINE',
+            'Health': 'HLT',
+            'Education': 'EDU',
+            'Groceries': 'GRC',
+            'Home Projects': 'HOME',
+            'Relationships': 'REL',
+            'Escrow / Lending': 'ESC',
+            'Mandate': 'MAN',
+            'Adjustment': 'ADJ',
+            'Transfer (Self)': 'XFR',
+            'Vice': 'VCE',
+        };
+
+        const st = {
+            flowVal: null,
+            flowCls: null,
+            account: null,
+            dest: null,
+            cat: null,
+        };
+
+        document.addEventListener('DOMContentLoaded', init);
+
+        async function init() {
+            if (!initialized) {
+                document.getElementById('connect-btn').addEventListener('click', saveApiUrl);
+                document.getElementById('settings-btn').addEventListener('click', resetApiUrl);
+                document.getElementById('sbtn').addEventListener('click', doSubmit);
+                document.getElementById('amount').addEventListener('input', renderPatternMatches);
+                initialized = true;
+            }
+            
+            if (!API_URL) {
+                showSetup();
+                return;
+            }
+            
+            showLoading();
+            try {
+                const res = await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'getConfig' }),
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+                }).then(r => r.json());
+                
+                if (!res.ok) throw new Error(res.error || 'Failed to connect');
+                CONFIG = res.data;
+                
+                st.flowVal = CONFIG.defaults.flow;
+                st.flowCls = CONFIG.defaults.flowCls;
+                st.account = CONFIG.defaults.account || null;
+                
+                hideLoading();
+                document.getElementById('main-app').classList.remove('hidden');
+                
+                renderFlowButtons();
+                renderAccountButtons('acct-grid', setAcct, st.account);
+                renderAccountButtons('dest-grid', setDest, st.dest);
+                renderCategoryButtons();
+                applyFlowState();
+                document.getElementById('amount').focus();
+            } catch (err) {
+                hideLoading();
+                toast(err.message, 'err');
+                showSetup();
+            }
+        }
+
+        function showSetup() {
+            document.getElementById('main-app').classList.add('hidden');
+            document.getElementById('load-app').classList.add('hidden');
+            document.getElementById('setup-app').classList.remove('hidden');
+            document.getElementById('api-url-input').value = API_URL || '';
+        }
+
+        function showLoading() {
+            document.getElementById('setup-app').classList.add('hidden');
+            document.getElementById('main-app').classList.add('hidden');
+            document.getElementById('load-app').classList.remove('hidden');
+        }
+
+        function hideLoading() {
+            document.getElementById('load-app').classList.add('hidden');
+        }
+
+        function saveApiUrl() {
+            const url = document.getElementById('api-url-input').value.trim();
+            if (!url) return;
+            API_URL = url;
+            localStorage.setItem(API_KEY_STORE, API_URL);
+            init();
+        }
+
+        function resetApiUrl() {
+            localStorage.removeItem(API_KEY_STORE);
+            API_URL = null;
+            showSetup();
+        }
+
+        function renderFlowButtons() {
+            const grid = document.getElementById('flow-grid');
+            grid.innerHTML = '';
+            CONFIG.flows.forEach(flow => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'fb';
+                btn.dataset.value = flow.value;
+                btn.dataset.cls = flow.cls;
+                btn.textContent = flow.label;
+                btn.addEventListener('click', () => setFlow(flow));
+                grid.appendChild(btn);
+            });
+        }
+
+        function renderAccountButtons(gridId, handler, selected) {
+            const grid = document.getElementById(gridId);
+            grid.innerHTML = '';
+            CONFIG.accounts.forEach(account => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'ab';
+                btn.dataset.value = account;
+                btn.textContent = account;
+                btn.classList.toggle('on', account === selected);
+                btn.addEventListener('click', () => handler(account));
+                grid.appendChild(btn);
+            });
+        }
+
+        function renderCategoryButtons() {
+            const grid = document.getElementById('cat-grid');
+            grid.innerHTML = '';
+            CONFIG.categories.forEach(category => {
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.className = 'cb';
+                btn.dataset.value = category;
+                btn.innerHTML = '<span class="i"></span><span></span>';
+                btn.querySelector('.i').textContent = ICONS[category] || 'CAT';
+                btn.querySelector('span:last-child').textContent = category;
+                btn.classList.toggle('on', category === st.cat);
+                btn.addEventListener('click', () => setCat(category));
+                grid.appendChild(btn);
+            });
+        }
+
+        function setFlow(flow) {
+            st.flowVal = flow.value;
+            st.flowCls = flow.cls;
+            st.cat = st.flowCls === 'tr' ? CONFIG.defaults.transferCategory : null;
+            st.dest = st.flowCls === 'tr' ? st.dest : null;
+            applyFlowState();
+            renderSuggestions();
+        }
+
+        function setAcct(account) {
+            st.account = account;
+            renderAccountButtons('acct-grid', setAcct, st.account);
+            renderSuggestions();
+        }
+
+        function setDest(account) {
+            st.dest = account;
+            renderAccountButtons('dest-grid', setDest, st.dest);
+        }
+
+        function setCat(category) {
+            st.cat = category;
+            renderCategoryButtons();
+            renderSuggestions();
+        }
+
+        function applyFlowState() {
+            document.querySelectorAll('.fb').forEach(btn => {
+                btn.className = 'fb';
+                if (btn.dataset.value === st.flowVal) btn.classList.add('sel-' + st.flowCls);
+            });
+
+            const isTransfer = st.flowCls === 'tr';
+            document.getElementById('dest-sec').classList.toggle('hidden', !isTransfer);
+            document.getElementById('cat-sec').classList.toggle('hidden', isTransfer);
+            renderAccountButtons('dest-grid', setDest, st.dest);
+            renderCategoryButtons();
+            updateSubmitColor();
+        }
+
+        function doSubmit() {
+            const amountRaw = document.getElementById('amount').value.trim();
+            const desc = document.getElementById('desc').value.trim();
+            const tag = document.getElementById('tag').value.trim();
+            const btn = document.getElementById('sbtn');
+
+            if (amountRaw === '' || Number.isNaN(Number(amountRaw)) || Number(amountRaw) < 0) {
+                toast('Enter a valid amount', 'err');
+                return;
+            }
+            if (!st.account) {
+                toast('Select an account', 'err');
+                return;
+            }
+            if (!st.cat) {
+                toast('Select a category', 'err');
+                return;
+            }
+            if (st.flowCls === 'tr' && !st.dest) {
+                toast('Select destination account', 'err');
+                return;
+            }
+
+            // Immediately clear the form and show success (Optimistic UI)
+            btn.classList.add('c-ok');
+            btn.textContent = 'LOGGED';
+            toast('Logged', 'ok');
+            
+            saveSuggestion(st.flowVal, st.account, st.cat, desc);
+            savePattern(amountRaw, st.flowVal, st.account, st.cat, st.dest, desc, tag);
+            
+            setTimeout(resetForm, 400);
+
+            // Fire and forget
+            fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({
+                    action: 'submitEntry',
+                    data: {
+                        flow: st.flowVal,
+                        account: st.account,
+                        amount: amountRaw,
+                        destination: st.dest,
+                        category: st.cat,
+                        description: desc,
+                        tag: tag,
+                    }
+                }),
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+            })
+            .then(r => r.json())
+            .then(res => {
+                if (!res.ok) toast('Log failed: ' + res.error, 'err');
+            })
+            .catch(error => {
+                toast('Background log failed: ' + error.message, 'err');
+            });
+        }
+
+        function resetForm() {
+            document.getElementById('amount').value = '';
+            document.getElementById('desc').value = '';
+            document.getElementById('tag').value = '';
+            const btn = document.getElementById('sbtn');
+            btn.disabled = false;
+            btn.classList.remove('c-ok', 'c-er');
+            btn.textContent = 'LOG ENTRY';
+            if (st.flowCls !== 'tr') st.cat = null;
+            st.account = null;
+            renderAccountButtons('acct-grid', setAcct, st.account);
+            updateSubmitColor();
+            renderCategoryButtons();
+            renderSuggestions();
+            document.getElementById('qf-row').classList.add('hidden');
+            document.getElementById('amount').focus();
+        }
+
+        function updateSubmitColor() {
+            const btn = document.getElementById('sbtn');
+            btn.classList.remove('c-in', 'c-tr');
+            if (st.flowCls === 'in') btn.classList.add('c-in');
+            if (st.flowCls === 'tr') btn.classList.add('c-tr');
+        }
+
+        function getPatternData() {
+            try { return JSON.parse(localStorage.getItem(PATTERN_KEY) || '{}'); } 
+            catch (e) { return {}; }
+        }
+
+        function setPatternData(data) {
+            localStorage.setItem(PATTERN_KEY, JSON.stringify(data));
+        }
+
+        function savePattern(amount, flow, account, cat, dest, desc, tag) {
+            if (!amount) return;
+            const data = getPatternData();
+            if (!data[amount]) data[amount] = {};
+            const key = JSON.stringify({ flow, account, cat, dest, desc, tag });
+            data[amount][key] = (data[amount][key] || 0) + 1;
+            
+            data[amount] = Object.fromEntries(
+                Object.entries(data[amount]).sort((a, b) => b[1] - a[1]).slice(0, 5)
+            );
+            setPatternData(data);
+        }
+
+        function applyPattern(pStr) {
+            const p = JSON.parse(pStr);
+            st.flowVal = p.flow;
+            st.flowCls = CONFIG.flows.find(f => f.value === p.flow)?.cls || 'out';
+            st.account = p.account;
+            st.cat = p.cat;
+            st.dest = p.dest;
+            document.getElementById('desc').value = p.desc || '';
+            document.getElementById('tag').value = p.tag || '';
+            
+            applyFlowState();
+            renderAccountButtons('acct-grid', setAcct, st.account);
+            document.getElementById('qf-row').classList.add('hidden');
+        }
+
+        function renderPatternMatches() {
+            const amt = document.getElementById('amount').value.trim();
+            const row = document.getElementById('qf-row');
+            row.innerHTML = '';
+            
+            if (!amt || isNaN(amt)) {
+                row.classList.add('hidden');
+                return;
+            }
+            
+            const data = getPatternData();
+            const matches = data[amt];
+            if (!matches) {
+                row.classList.add('hidden');
+                return;
+            }
+            
+            const top = Object.entries(matches).sort((a, b) => b[1] - a[1]);
+            if (!top.length) {
+                row.classList.add('hidden');
+                return;
+            }
+
+            top.forEach(([pStr]) => {
+                const p = JSON.parse(pStr);
+                const chip = document.createElement('button');
+                chip.type = 'button';
+                chip.className = 'sc';
+                chip.style.borderColor = 'var(--blu)';
+                chip.style.color = 'var(--blu)';
+                const destText = p.dest ? ` ➔ ${p.dest}` : '';
+                const descText = p.desc ? ` · ${p.desc}` : '';
+                const tagText = p.tag ? ` (${p.tag})` : '';
+                chip.textContent = `⚡ ${p.account}${destText} · ${p.cat}${descText}${tagText}`;
+                chip.addEventListener('click', () => applyPattern(pStr));
+                row.appendChild(chip);
+            });
+            row.classList.remove('hidden');
+        }
+
+        function getSuggData() {
+            try {
+                return JSON.parse(localStorage.getItem(SUGG_KEY) || '{}');
+            } catch (error) {
+                return {};
+            }
+        }
+
+        function setSuggData(data) {
+            localStorage.setItem(SUGG_KEY, JSON.stringify(data));
+        }
+
+        function trimSuggCombo(combo) {
+            return Object.fromEntries(
+                Object.entries(combo).sort((a, b) => b[1] - a[1]).slice(0, 20)
+            );
+        }
+
+        function saveSuggestion(flow, account, cat, desc) {
+            if (!desc || !cat) return;
+            const data = getSuggData();
+            const key = `${flow}|${account}|${cat}`;
+            if (!data[key]) data[key] = {};
+            data[key][desc] = (data[key][desc] || 0) + 1;
+            data[key] = trimSuggCombo(data[key]);
+            setSuggData(data);
+        }
+
+        function renderSuggestions() {
+            const row = document.getElementById('sugg-row');
+            row.innerHTML = '';
+            if (!st.cat) {
+                row.classList.add('hidden');
+                return;
+            }
+
+            const data = getSuggData();
+            const combo = data[`${st.flowVal}|${st.account}|${st.cat}`];
+            if (!combo) {
+                row.classList.add('hidden');
+                return;
+            }
+
+            const top = Object.entries(combo).sort((a, b) => b[1] - a[1]).slice(0, 5);
+            if (!top.length) {
+                row.classList.add('hidden');
+                return;
+            }
+
+            top.forEach(([desc]) => {
+                const chip = document.createElement('button');
+                chip.type = 'button';
+                chip.className = 'sc';
+                chip.textContent = desc;
+                chip.addEventListener('click', () => {
+                    document.getElementById('desc').value = desc;
+                    row.querySelectorAll('.sc').forEach(item => item.classList.remove('picked'));
+                    chip.classList.add('picked');
+                });
+                row.appendChild(chip);
+            });
+            row.classList.remove('hidden');
+        }
+
+        let toastTimer;
+        function toast(message, type) {
+            const el = document.getElementById('toast');
+            el.textContent = message;
+            el.style.color = type === 'err' ? '#ff4444' : '#22c55e';
+            clearTimeout(toastTimer);
+            toastTimer = setTimeout(() => {
+                el.textContent = '';
+            }, 3500);
+        }
+    </script>
+</body>
+
+</html>
