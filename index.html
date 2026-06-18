@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
     <base target="_top">
     <title>GYST</title>
     
@@ -76,13 +76,19 @@
             background: var(--bg);
             color: var(--t1);
             font-family: Syne, sans-serif;
-            min-height: 100vh;
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden;
             overscroll-behavior: none;
         }
 
         .app {
             max-width: 440px;
             margin: 0 auto;
+            height: 100vh;
+            height: 100dvh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
             padding: 0 0 60px;
         }
 

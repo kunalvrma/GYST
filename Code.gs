@@ -57,7 +57,7 @@ function doGet(e) {
   return HtmlService.createTemplateFromFile('index')
     .evaluate()
     .setTitle('moneyFlow')
-    .addMetaTag('viewport', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no');
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content');
 }
 
 function doPost(e) {
