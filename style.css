@@ -69,7 +69,7 @@
         }
 
         .hdr {
-            padding: 24px 20px 20px;
+            padding: 16px 16px 12px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -139,7 +139,7 @@
 
         .sec {
             padding: 0 16px;
-            margin-bottom: 18px;
+            margin-bottom: 12px;
         }
 
         .lbl {
@@ -198,7 +198,7 @@
         }
 
         .fb {
-            padding: 13px 6px;
+            padding: 10px 6px;
             font-size: 12px;
             letter-spacing: 0.03em;
         }
@@ -225,7 +225,7 @@
             background: var(--s1);
             border: 1.5px solid var(--b1);
             border-radius: var(--rl);
-            padding: 14px 18px;
+            padding: 10px 14px;
             display: flex;
             align-items: center;
             gap: 8px;
@@ -264,15 +264,15 @@
         }
 
         .ab {
-            min-height: 42px;
-            padding: 10px 4px;
+            min-height: 38px;
+            padding: 8px 4px;
             font-size: 11px;
             overflow-wrap: anywhere;
         }
 
         .cb {
-            min-height: 54px;
-            padding: 9px 4px;
+            min-height: 48px;
+            padding: 6px 4px;
             font-size: 10px;
             line-height: 1.2;
             display: flex;
@@ -302,7 +302,7 @@
             background: var(--s1);
             border: 1.5px solid var(--b1);
             border-radius: var(--r);
-            padding: 12px 14px;
+            padding: 10px 12px;
             font-family: "DM Mono", monospace;
             font-size: 13px;
             color: var(--t1);
@@ -338,7 +338,7 @@
         .div {
             height: 1px;
             background: var(--b1);
-            margin: 2px 16px 18px;
+            margin: 2px 16px 12px;
         }
 
         .sub-wrap {
