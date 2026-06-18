@@ -48,6 +48,12 @@ Since Google's native screens take 5 seconds to load (which is 4 seconds too lon
 3. Paste the URL to securely connect your private database.
 4. "Add to Home Screen" on your phone. You now have a blazing fast native app.
 
+### The HUD Experience
+We didn't just build a form; we built a progressive web app that actually respects your time:
+* **Instant Loading:** Your setup is cached locally. You don't stare at a "Connecting..." screen every time you open the app.
+* **Offline Sync:** Life doesn't always have 5G. If you log a transaction in a basement or on a flight, the HUD quietly queues it up and syncs it the second your connection returns. No data lost. No accidental double-entries.
+* **Aesthetics:** Smooth micro-animations, a clean sidebar menu, and a Light/Dark mode toggle (though Dark Mode is obviously superior).
+
 ---
 
 ## How GYST Works
