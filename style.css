@@ -222,9 +222,7 @@
         }
 
         .amt-box {
-            position: relative;
-            overflow: hidden;
-            background: transparent;
+            background: var(--s1);
             border: 1.5px solid var(--b1);
             border-radius: var(--rl);
             padding: 10px 14px;
@@ -232,39 +230,6 @@
             align-items: center;
             gap: 8px;
             transition: border-color 0.15s;
-            z-index: 1;
-        }
-
-        .amt-box::before {
-            content: "";
-            position: absolute;
-            top: 50%;
-            right: -20px;
-            transform: translateY(-50%);
-            width: 140px;
-            height: 140px;
-            background: url('logo-transparent-bg.png') no-repeat center right / contain;
-            opacity: 0.4;
-            z-index: -2;
-            pointer-events: none;
-            transition: opacity 0.3s ease, transform 0.3s ease;
-        }
-
-        .amt-box:focus-within::before {
-            opacity: 0.8;
-            transform: translateY(-50%) scale(1.05);
-        }
-
-        .amt-box::after {
-            content: "";
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: var(--s1);
-            opacity: 0.85;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            z-index: -1;
-            pointer-events: none;
         }
 
         .amt-box:focus-within,
@@ -273,8 +238,6 @@
         }
 
         .rp {
-            position: relative;
-            z-index: 1;
             font-family: "DM Mono", monospace;
             font-size: 24px;
             color: var(--t3);
@@ -283,8 +246,6 @@
         }
 
         #amount {
-            position: relative;
-            z-index: 1;
             flex: 1;
             background: transparent;
             border: none;
