@@ -52,6 +52,25 @@
             --rl: 14px;
         }
 
+        [data-theme="light"] {
+            --bg: #fafafa;
+            --s1: #ffffff;
+            --s2: #f4f4f5;
+            --s3: #e4e4e7;
+            --b1: #e4e4e7;
+            --b2: #d4d4d8;
+            --b3: #a1a1aa;
+            --t1: #18181b;
+            --t2: #71717a;
+            --t3: #a1a1aa;
+            --red: #ef4444;
+            --redbg: #fef2f2;
+            --grn: #22c55e;
+            --grnbg: #f0fdf4;
+            --blu: #3b82f6;
+            --blubg: #eff6ff;
+        }
+
         html,
         body {
             background: var(--bg);
@@ -73,6 +92,47 @@
             align-items: center;
             justify-content: space-between;
             gap: 16px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            background: var(--bg);
+        }
+
+        .drawer-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+        }
+        .drawer-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .drawer {
+            position: fixed;
+            top: 0; right: -280px; bottom: 0;
+            width: 280px;
+            background: var(--s1);
+            border-left: 1px solid var(--b1);
+            z-index: 1000;
+            transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            padding: 24px 20px;
+            box-shadow: -4px 0 24px rgba(0,0,0,0.5);
+        }
+        .drawer.open {
+            right: 0;
+        }
+        .drawer-btn {
+            background: none; border: none; outline: none;
+            color: var(--t1); font-family: "DM Mono", monospace;
+            font-size: 14px; text-align: left; padding: 16px 0;
+            border-bottom: 1px solid var(--b1); cursor: pointer;
         }
 
         .logo {
@@ -347,7 +407,7 @@
 
 <body>
     <div id="setup-app" class="app hidden" style="text-align:center; padding-top:40px;">
-        <div class="logo" style="margin-bottom:30px; line-height:1.2;">GYST<br><span style="font-size:15px; color:var(--t2); font-weight:500;">money<em>Flow</em></span></div>
+        <img src="logo-transparent-bg.png" alt="GYST Logo" style="height:48px; margin-bottom:20px;">
         <h2 style="font-size:18px; margin-bottom:12px; font-weight:700; color:var(--t1);">Ready to get your shit together?</h2>
         <p style="font-size:13px; color:var(--t2); margin-bottom:28px; line-height:1.6; padding:0 10px;">
             No aesthetic templates. No guilt trips. Just log your transactions and move on.<br><br>
@@ -358,15 +418,32 @@
     </div>
 
     <div id="load-app" class="app hidden" style="text-align:center; padding-top:60px;">
-        <div class="logo" style="margin-bottom:10px; line-height:1.2;">GYST<br><span style="font-size:15px; color:var(--t2); font-weight:500;">money<em>Flow</em></span></div>
+        <img src="logo-transparent-bg.png" alt="GYST Logo" style="height:40px; margin-bottom:16px;">
         <p style="font-size:12px; color:var(--t2);">Connecting...</p>
     </div>
 
+    <!-- Hamburger Drawer -->
+    <div id="drawer-overlay" class="drawer-overlay"></div>
+    <div id="drawer" class="drawer">
+        <div style="font-size:18px; font-weight:700; margin-bottom:32px;">Settings</div>
+        <button class="drawer-btn" id="theme-toggle-btn">Toggle Light/Dark Mode</button>
+        <button class="drawer-btn" id="drawer-reset-btn" style="color:var(--red);">Reset Database Link</button>
+        <div style="flex:1"></div>
+        <button class="drawer-btn" style="border:none; color:var(--t3); font-size:11px;">Privacy Policy</button>
+        <button class="drawer-btn" style="border:none; color:var(--t3); font-size:11px;">Terms & Conditions</button>
+        <button class="drawer-btn" style="border:none; color:var(--t3); font-size:11px;">Contact Us</button>
+        <div style="font-size:10px; color:var(--t3); margin-top:20px; font-family:'DM Mono', monospace;">v1.0.0</div>
+    </div>
+
     <div id="main-app" class="app hidden">
-        <div class="hdr" style="position:relative;">
-            <div class="logo">GYST <span style="font-size:15px; color:var(--t2); margin-left:4px; font-weight:500;">money<em id="flow-text" style="transition: color 0.3s;">Flow</em></span></div>
-            <div id="settings-btn" style="font-size:11px; color:var(--t3); cursor:pointer; font-family:'DM Mono', monospace; letter-spacing:0.05em; text-transform:uppercase;" title="Update API URL">RESET</div>
-            <div id="toast" style="position:absolute; top:55px; right:20px; text-align:right;"></div>
+        <div class="hdr">
+            <div class="logo" style="display:flex; align-items:center;">
+                <img src="logo-transparent-bg.png" alt="GYST" style="height:28px;">
+                <span id="flow-text" style="font-size:13px; color:transparent; margin-left:8px; font-weight:500; transition: color 0.3s;">Flowed</span>
+                <div id="sync-indicator" class="hidden" style="width:8px; height:8px; background:var(--t2); border-radius:50%; margin-left:8px;" title="Offline entries pending"></div>
+            </div>
+            <div id="hamburger-btn" style="font-size:24px; color:var(--t1); cursor:pointer; user-select:none; line-height:1;">&#9776;</div>
+            <div id="toast" style="position:absolute; top:70px; right:20px; text-align:right;"></div>
         </div>
 
         <div class="sec">
@@ -423,8 +500,12 @@
         const SUGG_KEY = 'mf_sugg';
         const PATTERN_KEY = 'mf_patterns';
         const API_KEY_STORE = 'mf_api_url';
+        const QUEUE_KEY = 'mf_sync_queue';
+        const CONFIG_CACHE_KEY = 'mf_config';
+        const THEME_KEY = 'mf_theme';
         let API_URL = localStorage.getItem(API_KEY_STORE);
         let initialized = false;
+        let isSyncing = false;
 
         const ICONS = {
             'Investments': 'INV',
@@ -452,51 +533,172 @@
             cat: null,
         };
 
-        document.addEventListener('DOMContentLoaded', init);
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+
+        function getQueue() {
+            try { return JSON.parse(localStorage.getItem(QUEUE_KEY) || '[]'); }
+            catch (e) { return []; }
+        }
+
+        function saveQueue(q) {
+            localStorage.setItem(QUEUE_KEY, JSON.stringify(q));
+            updateSyncIndicator();
+        }
+
+        function updateSyncIndicator() {
+            const q = getQueue();
+            const ind = document.getElementById('sync-indicator');
+            if (ind) {
+                ind.classList.toggle('hidden', q.length === 0);
+            }
+        }
+
+        async function processQueue() {
+            if (isSyncing || !API_URL) return;
+            const q = getQueue();
+            if (q.length === 0) return;
+
+            isSyncing = true;
+            const entry = q[0];
+
+            try {
+                const res = await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'submitEntry', data: entry }),
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+                }).then(r => r.json());
+
+                if (res.ok) {
+                    const currentQ = getQueue();
+                    if (currentQ.length > 0 && currentQ[0].id === entry.id) {
+                        currentQ.shift();
+                        saveQueue(currentQ);
+                    }
+                    setTimeout(() => {
+                        isSyncing = false;
+                        processQueue();
+                    }, 500);
+                } else {
+                    toast('Log failed: ' + res.error, 'err');
+                    isSyncing = false;
+                }
+            } catch (error) {
+                toast(`Offline: ${q.length} queued`, 'err');
+                isSyncing = false;
+            }
+        }
+
+        function initTheme() {
+            let theme = localStorage.getItem(THEME_KEY);
+            if (!theme) {
+                theme = window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark';
+            }
+            document.documentElement.setAttribute('data-theme', theme);
+        }
+
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const next = current === 'light' ? 'dark' : 'light';
+            document.documentElement.setAttribute('data-theme', next);
+            localStorage.setItem(THEME_KEY, next);
+        }
+
+        function toggleDrawer() {
+            const overlay = document.getElementById('drawer-overlay');
+            const drawer = document.getElementById('drawer');
+            overlay.classList.toggle('open');
+            drawer.classList.toggle('open');
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            init();
+        });
 
         async function init() {
             if (!initialized) {
                 document.getElementById('connect-btn').addEventListener('click', saveApiUrl);
-                document.getElementById('settings-btn').addEventListener('click', resetApiUrl);
+                document.getElementById('drawer-reset-btn').addEventListener('click', () => { toggleDrawer(); resetApiUrl(); });
+                document.getElementById('hamburger-btn').addEventListener('click', toggleDrawer);
+                document.getElementById('drawer-overlay').addEventListener('click', toggleDrawer);
+                document.getElementById('theme-toggle-btn').addEventListener('click', toggleTheme);
                 document.getElementById('sbtn').addEventListener('click', doSubmit);
                 document.getElementById('amount').addEventListener('input', renderPatternMatches);
                 initialized = true;
             }
             
+            updateSyncIndicator();
+
             if (!API_URL) {
                 showSetup();
                 return;
             }
             
-            showLoading();
+            processQueue();
+
+            const cached = localStorage.getItem(CONFIG_CACHE_KEY);
+            if (cached) {
+                try {
+                    CONFIG = JSON.parse(cached);
+                    renderAppFromConfig();
+                } catch (e) {}
+            } else {
+                showLoading();
+            }
+
             try {
-                const res = await fetch(API_URL, {
+                fetch(API_URL, {
                     method: 'POST',
                     body: JSON.stringify({ action: 'getConfig' }),
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' }
-                }).then(r => r.json());
-                
-                if (!res.ok) throw new Error(res.error || 'Failed to connect');
-                CONFIG = res.data;
-                
-                st.flowVal = CONFIG.defaults.flow;
-                st.flowCls = CONFIG.defaults.flowCls;
-                st.account = CONFIG.defaults.account || null;
-                
-                hideLoading();
-                document.getElementById('main-app').classList.remove('hidden');
-                
-                renderFlowButtons();
-                renderAccountButtons('acct-grid', setAcct, st.account);
-                renderAccountButtons('dest-grid', setDest, st.dest);
-                renderCategoryButtons();
-                applyFlowState();
-                document.getElementById('amount').focus();
+                })
+                .then(r => r.json())
+                .then(res => {
+                    if (res.ok && res.data) {
+                        const newConfigStr = JSON.stringify(res.data);
+                        if (newConfigStr !== cached) {
+                            CONFIG = res.data;
+                            localStorage.setItem(CONFIG_CACHE_KEY, newConfigStr);
+                            renderAppFromConfig();
+                        }
+                    } else if (!cached) {
+                        throw new Error(res.error || 'Failed to connect');
+                    }
+                })
+                .catch(err => {
+                    if (!cached) {
+                        hideLoading();
+                        toast(err.message, 'err');
+                        showSetup();
+                    }
+                });
             } catch (err) {
-                hideLoading();
-                toast(err.message, 'err');
-                showSetup();
+                if (!cached) {
+                    hideLoading();
+                    toast(err.message, 'err');
+                    showSetup();
+                }
             }
+        }
+
+        function renderAppFromConfig() {
+            st.flowVal = st.flowVal || CONFIG.defaults.flow;
+            st.flowCls = st.flowCls || CONFIG.defaults.flowCls;
+            st.account = st.account || CONFIG.defaults.account || null;
+            
+            hideLoading();
+            document.getElementById('main-app').classList.remove('hidden');
+            
+            renderFlowButtons();
+            renderAccountButtons('acct-grid', setAcct, st.account);
+            renderAccountButtons('dest-grid', setDest, st.dest);
+            renderCategoryButtons();
+            applyFlowState();
         }
 
         function showSetup() {
@@ -526,6 +728,7 @@
 
         function resetApiUrl() {
             localStorage.removeItem(API_KEY_STORE);
+            localStorage.removeItem(CONFIG_CACHE_KEY);
             API_URL = null;
             showSetup();
         }
@@ -650,30 +853,22 @@
             
             setTimeout(resetForm, 400);
 
-            // Fire and forget
-            fetch(API_URL, {
-                method: 'POST',
-                body: JSON.stringify({
-                    action: 'submitEntry',
-                    data: {
-                        flow: st.flowVal,
-                        account: st.account,
-                        amount: amountRaw,
-                        destination: st.dest,
-                        category: st.cat,
-                        description: desc,
-                        tag: tag,
-                    }
-                }),
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' }
-            })
-            .then(r => r.json())
-            .then(res => {
-                if (!res.ok) toast('Log failed: ' + res.error, 'err');
-            })
-            .catch(error => {
-                toast('Background log failed: ' + error.message, 'err');
-            });
+            const entryData = {
+                id: generateUUID(),
+                flow: st.flowVal,
+                account: st.account,
+                amount: amountRaw,
+                destination: st.dest,
+                category: st.cat,
+                description: desc,
+                tag: tag,
+            };
+
+            const q = getQueue();
+            q.push(entryData);
+            saveQueue(q);
+
+            processQueue();
         }
 
         function resetForm() {

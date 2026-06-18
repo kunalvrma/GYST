@@ -11,6 +11,7 @@ const MONEYFLOW = {
     'Category',
     'Description',
     'Person / Tag',
+    'ID',
   ],
   HEADER_ALIASES: {
     timestamp: ['Timestamp', 'Submitted At', 'Date', 'Date/Time'],
@@ -21,6 +22,7 @@ const MONEYFLOW = {
     category: ['Category', 'Spend Category'],
     description: ['Description', 'Notes', 'Memo', 'Particulars'],
     tag: ['Person / Tag', 'Person', 'Tag', 'Person/Tag'],
+    id: ['ID', 'UUID', 'Transaction ID', 'Txn ID'],
   },
   DEFAULT_ACCOUNTS: ['Cash', 'UBI', 'Kotak811', 'SBI', 'Zerodha', 'Axis'],
   DEFAULT_CATEGORIES: [
@@ -102,6 +104,26 @@ function submitEntry(payload) {
     const ss = getSpreadsheet_();
     const sheet = getTransactionsSheet_(ss);
     const headerMap = ensureTransactionHeaders_(sheet);
+
+    if (entry.id && headerMap['id'] !== undefined) {
+      const lastRow = sheet.getLastRow();
+      const startRow = Math.max(2, lastRow - 50);
+      const numRows = lastRow - startRow + 1;
+      if (numRows > 0) {
+        const idColIndex = headerMap['id'] + 1;
+        const recentIds = sheet.getRange(startRow, idColIndex, numRows, 1).getValues();
+        for (let i = 0; i < recentIds.length; i++) {
+          if (recentIds[i][0] === entry.id) {
+            return {
+              ok: true,
+              message: receipt_(entry) + ' (Duplicate)',
+              row: startRow + i,
+            };
+          }
+        }
+      }
+    }
+
     const row = new Array(sheet.getLastColumn()).fill('');
 
     setByKey_(row, headerMap, 'timestamp', new Date());
@@ -112,6 +134,7 @@ function submitEntry(payload) {
     setByKey_(row, headerMap, 'category', entry.category);
     setByKey_(row, headerMap, 'description', entry.description);
     setByKey_(row, headerMap, 'tag', entry.tag);
+    setByKey_(row, headerMap, 'id', entry.id);
 
     sheet.appendRow(row);
 
@@ -139,6 +162,7 @@ function getSpreadsheet_() {
 
 function normalizeEntry_(payload) {
   payload = payload || {};
+  const id = cleanString_(payload.id);
   const flow = cleanString_(payload.flow);
   const account = cleanString_(payload.account);
   const destination = cleanString_(payload.destination);
@@ -161,6 +185,7 @@ function normalizeEntry_(payload) {
   }
 
   return {
+    id,
     flow,
     account,
     amount,
@@ -208,6 +233,7 @@ function ensureTransactionHeaders_(sheet) {
     { key: 'category', header: 'Category' },
     { key: 'description', header: 'Description' },
     { key: 'tag', header: 'Person / Tag' },
+    { key: 'id', header: 'ID' },
   ];
 
   requiredFields.forEach(function (field) {
