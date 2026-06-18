@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, interactive-widget=resizes-content">
+    <base target="_top">
+    <title>GYST</title>
+    
+    <!-- Premium PWA / Native App Meta Tags -->
+    <meta name="theme-color" content="#0a0a0a">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="GYST">
+    <link rel="manifest" href="/assets/manifest-y4qoFUp9.json">
+    <link rel="apple-touch-icon" href="/assets/icon-192-_sLnPg_o.png">
+
+    <!-- Open Graph (Link Previews) -->
+    <meta property="og:title" content="GYST">
+    <meta property="og:description" content="A personal finance system built for imperfect humans.">
+    <meta property="og:image" content="/assets/icon-512-Bul2f9z1.png">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@500;600;700&display=swap"
+        rel="stylesheet">
+  <script type="module" crossorigin src="/assets/index-BY7vfCsO.js"></script>
+  <link rel="stylesheet" crossorigin href="/assets/index-C3DtDb5I.css">
+</head>
+
+<body>
+    <div id="setup-app" class="app hidden" style="text-align:center; padding-top:40px;">
+        <div class="logo" style="margin-bottom:30px; line-height:1.2;">
+            <img src="/assets/logo-transparent-bg-OkK5u_e6.png" alt="GYST Logo" style="height:96px; display:block; margin:0 auto 8px;">
+            <span style="font-size:15px; color:var(--t2); font-weight:500;">money<em>Flow</em></span>
+        </div>
+        <h2 style="font-size:18px; margin-bottom:12px; font-weight:700; color:var(--t1);">Ready to get your shit together?</h2>
+        <p style="font-size:13px; color:var(--t2); margin-bottom:28px; line-height:1.6; padding:0 10px;">
+            No aesthetic templates. No guilt trips. Just log your transactions and move on.<br><br>
+            Paste your Web App URL below to connect.
+        </p>
+        <input type="text" id="api-url-input" class="ti" placeholder="Paste Web App URL here..." style="margin-bottom:16px; text-align:center;">
+        <button id="connect-btn" class="fb" style="width:100%; padding:15px; background:var(--red); color:#fff; border:none; font-size:14px; font-weight:700; letter-spacing:0.05em;">LINK DATABASE</button>
+    </div>
+
+    <div id="load-app" class="app hidden" style="text-align:center; padding-top:60px;">
+        <div class="logo" style="margin-bottom:20px; line-height:1.2;">
+            <img src="/assets/logo-transparent-bg-OkK5u_e6.png" alt="GYST Logo" style="height:80px; display:block; margin:0 auto 8px;">
+            <span style="font-size:15px; color:var(--t2); font-weight:500;">money<em>Flow</em></span>
+        </div>
+        <p style="font-size:12px; color:var(--t2);">Connecting...</p>
+    </div>
+
+    <!-- Hamburger Drawer -->
+    <div id="drawer-overlay" class="drawer-overlay"></div>
+    <div id="drawer" class="drawer">
+        <div style="font-size:18px; font-weight:700; margin-bottom:32px;">Settings</div>
+        <button class="drawer-btn" id="theme-toggle-btn">Toggle Light/Dark Mode</button>
+        <button class="drawer-btn" id="drawer-reset-btn" style="color:var(--red);">Reset Database Link</button>
+        <div style="flex:1"></div>
+        <button class="drawer-btn" style="border:none; color:var(--t3); font-size:11px;">Privacy Policy</button>
+        <button class="drawer-btn" style="border:none; color:var(--t3); font-size:11px;">Terms & Conditions</button>
+        <button class="drawer-btn" style="border:none; color:var(--t3); font-size:11px;">Contact Us</button>
+        <div style="font-size:10px; color:var(--t3); margin-top:20px; font-family:'DM Mono', monospace;">v1.0.0</div>
+    </div>
+
+    <div id="main-app" class="app hidden">
+        <div class="hdr">
+            <div class="logo" style="display:flex; align-items:center;">
+                <img src="/assets/logo-transparent-bg-OkK5u_e6.png" alt="GYST" style="height:36px;">
+                <span style="font-size:15px; color:var(--t2); margin-left:8px; font-weight:500;">money<em id="flow-text" style="transition: color 0.3s;">Flow</em></span>
+                <div id="sync-indicator" class="hidden" style="width:8px; height:8px; background:var(--t2); border-radius:50%; margin-left:8px;" title="Offline entries pending"></div>
+            </div>
+            <div id="hamburger-btn" style="font-size:24px; color:var(--t1); cursor:pointer; user-select:none; line-height:1;">&#9776;</div>
+            <div id="toast" style="position:absolute; top:70px; right:20px; text-align:right;"></div>
+        </div>
+
+        <div class="sec">
+            <div class="lbl">Flow Type</div>
+            <div class="flow-row" id="flow-grid"></div>
+        </div>
+
+        <div class="sec">
+            <div class="lbl">Amount</div>
+            <div class="amt-box">
+                <span class="rp">&#8377;</span>
+                <input type="number" id="amount" placeholder="0" inputmode="decimal" autocomplete="off">
+            </div>
+            <div id="qf-row" class="hidden" style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;"></div>
+        </div>
+
+        <div class="sec">
+            <div class="lbl">Account</div>
+            <div class="acct-row" id="acct-grid"></div>
+        </div>
+
+        <div class="sec hidden" id="dest-sec">
+            <div class="lbl">Destination Account</div>
+            <div class="acct-row" id="dest-grid"></div>
+        </div>
+
+        <div class="sec" id="cat-sec">
+            <div class="lbl">Category</div>
+            <div class="cat-row" id="cat-grid"></div>
+        </div>
+
+        <div class="div"></div>
+
+        <div class="sec">
+            <div class="lbl">Description <span
+                    style="text-transform:none;letter-spacing:0;font-size:8px;color:#333">optional</span></div>
+            <div id="sugg-row" class="hidden"></div>
+            <input class="ti" type="text" id="desc" placeholder="Swiggy, Petrol, EMI, Salary..." autocomplete="off">
+        </div>
+
+        <div class="sec">
+            <div class="lbl">Person / Tag <span
+                    style="text-transform:none;letter-spacing:0;font-size:8px;color:#333">optional</span></div>
+            <input class="ti" type="text" id="tag" placeholder="Rahul, Work, Trip..." autocomplete="off">
+        </div>
+
+        <div class="sub-wrap">
+            <button id="sbtn" type="button">LOG ENTRY</button>
+        </div>
+    </div>
+
+</body>
+
+</html>
