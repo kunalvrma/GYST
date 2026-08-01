@@ -149,13 +149,9 @@ function submitEntry(payload) {
 }
 
 function getSpreadsheet_() {
-  if (MONEYFLOW.SPREADSHEET_ID) {
-    return SpreadsheetApp.openById(MONEYFLOW.SPREADSHEET_ID);
-  }
-
   const ss = SpreadsheetApp.getActive();
   if (!ss) {
-    throw new Error('No active spreadsheet. Bind this script to your sheet or set MONEYFLOW.SPREADSHEET_ID.');
+    throw new Error('No active spreadsheet. Bind this script to your sheet.');
   }
   return ss;
 }
