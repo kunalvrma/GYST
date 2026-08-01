@@ -4,6 +4,14 @@ All notable changes to the GYST personal finance system are documented here.
 
 ---
 
+## [2026-08-02]
+
+### Fixed
+
+- **OAuth Scope Inflation** — Removed a dead-code fallback in Code.gs (SpreadsheetApp.openById(), gated behind an always-empty constant) that was causing Apps Script to auto-detect and request the broad `spreadsheets` scope at deploy time. Added an explicit oauthScopes declaration in appsscript.json (spreadsheets.currentonly + script.external_request) so deployments now request only the narrow permissions the code actually uses. Verified via live OAuth consent screen on a test deployment.
+
+---
+
 ## [2026-06-23]
 
 ### Added
