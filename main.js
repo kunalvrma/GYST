@@ -232,9 +232,16 @@ let CONFIG = null;
         }
 
         function resetApiUrl() {
+            const q = getQueue();
+            if (q.length > 0) {
+                const ok = confirm('You have ' + q.length + ' unsynced entries that will be lost if you disconnect. Continue anyway?');
+                if (!ok) return;
+            }
             localStorage.removeItem(API_KEY_STORE);
             localStorage.removeItem(CONFIG_CACHE_KEY);
+            localStorage.removeItem(QUEUE_KEY);
             API_URL = null;
+            updateSyncIndicator();
             showSetup();
         }
 
@@ -345,6 +352,18 @@ let CONFIG = null;
             }
             if (st.flowCls === 'tr' && !st.dest) {
                 toast('Select destination account', 'err');
+                return;
+            }
+            if (st.account && !CONFIG.accounts.includes(st.account)) {
+                toast('Selected account no longer exists — please choose again.', 'err');
+                return;
+            }
+            if (st.cat && !CONFIG.categories.includes(st.cat)) {
+                toast('Selected category no longer exists — please choose again.', 'err');
+                return;
+            }
+            if (st.dest && !CONFIG.accounts.includes(st.dest)) {
+                toast('Selected destination account no longer exists — please choose again.', 'err');
                 return;
             }
 

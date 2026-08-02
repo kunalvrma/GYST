@@ -9,6 +9,8 @@ All notable changes to the GYST personal finance system are documented here.
 ### Fixed
 
 - **OAuth Scope Inflation** — Removed a dead-code fallback in Code.gs (SpreadsheetApp.openById(), gated behind an always-empty constant) that was causing Apps Script to auto-detect and request the broad `spreadsheets` scope at deploy time. Added an explicit oauthScopes declaration in appsscript.json (spreadsheets.currentonly + script.external_request) so deployments now request only the narrow permissions the code actually uses. Verified via live OAuth consent screen on a test deployment.
+- **Reset Database Link now guards unsynced entries** — If the offline sync queue contains pending entries when the user taps "Reset Database Link," a confirmation dialog warns them that N unsynced entries will be lost. Cancelling the dialog aborts the reset entirely. On confirmation (or if the queue is empty), the reset now also clears `mf_sync_queue`, preventing orphaned entries from silently posting to a different sheet on reconnect. `mf_history`, `mf_patterns`, and `mf_sugg` are intentionally preserved across resets.
+- **Stale pattern/suggestion validation** — Submission now validates that the selected account, category, and destination account still exist in the connected sheet's current settings — a stale pattern or suggestion referencing a renamed, deleted, or foreign value is rejected with an on-screen message instead of silently syncing.
 
 ---
 
