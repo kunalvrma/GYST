@@ -389,13 +389,13 @@ function getSnapshot(params) {
     monthlyBurn:    dash.getRange('N7').getValue(),
   };
 
-  // ── Liquidity Accounts (B13:D19, up to 15 rows, skip blanks) ──
+  // ── Liquidity Accounts (B13:D27, up to 15 rows, skip blanks) ──
   const accountData = dash.getRange('B13:D27').getValues(); // 15-row cap
   const accounts = [];
   accountData.forEach(function(row) {
-    const name = cleanString_(row[0]);
+    const name = cleanString_(row[0]); // col B = name
     if (name) {
-      accounts.push({ name: name, balance: row[1] });
+      accounts.push({ name: name, balance: row[2] }); // col D = balance (col C is empty after Ghost Money removal)
     }
   });
 
