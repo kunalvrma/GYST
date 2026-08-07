@@ -66,6 +66,18 @@
         <div style="font-size:10px; color:var(--t3); margin-top:20px; font-family:'DM Mono', monospace;">v1.0.0</div>
     </div>
 
+    <!-- Bottom Nav (shown when app is connected) -->
+    <nav id="bottom-nav" class="bottom-nav hidden">
+        <button class="nav-btn active" id="nav-log" type="button">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>Log</span>
+        </button>
+        <button class="nav-btn" id="nav-dashboard" type="button">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect></svg>
+            <span>Dashboard</span>
+        </button>
+    </nav>
+
     <div id="main-app" class="app hidden">
         <div class="hdr">
             <div class="logo" style="display:flex; align-items:center;">
@@ -123,6 +135,129 @@
 
         <div class="sub-wrap">
             <button id="sbtn" type="button">LOG ENTRY</button>
+        </div>
+    </div>
+
+    <!-- Dashboard Screen -->
+    <div id="dash-app" class="app hidden">
+        <div class="hdr">
+            <div class="logo" style="display:flex; align-items:center;">
+                <img src="logo-transparent-bg.png" alt="GYST" style="height:36px;">
+                <span style="font-size:15px; color:var(--t2); margin-left:8px; font-weight:500;">money<em style="font-style:normal;">Flow</em></span>
+            </div>
+            <div id="hamburger-btn-dash" style="font-size:24px; color:var(--t1); cursor:pointer; user-select:none; line-height:1;">&#9776;</div>
+        </div>
+
+        <!-- Time Machine -->
+        <div class="ds-section ds-time-machine">
+            <div class="ds-tm-row">
+                <div class="ds-tm-label">Viewing</div>
+                <div class="ds-tm-controls">
+                    <select id="tm-month" class="tm-select">
+                        <option value="1">Jan</option><option value="2">Feb</option>
+                        <option value="3">Mar</option><option value="4">Apr</option>
+                        <option value="5">May</option><option value="6">Jun</option>
+                        <option value="7">Jul</option><option value="8">Aug</option>
+                        <option value="9">Sep</option><option value="10">Oct</option>
+                        <option value="11">Nov</option><option value="12">Dec</option>
+                    </select>
+                    <input id="tm-year" class="tm-input" type="number" min="2020" max="2099" placeholder="2026">
+                    <button id="tm-go" class="tm-go-btn" type="button">GO</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dashboard loading / error state -->
+        <div id="ds-loading" class="ds-state-msg hidden">Fetching snapshot...</div>
+        <div id="ds-error" class="ds-state-msg ds-error hidden"></div>
+
+        <!-- Hero -->
+        <div id="ds-hero" class="ds-section hidden">
+            <div class="ds-hero-grid">
+                <div class="ds-hero-card ds-hero-primary">
+                    <div class="ds-hero-label">Net Worth</div>
+                    <div class="ds-hero-value" id="dh-networth">—</div>
+                </div>
+                <div class="ds-hero-card">
+                    <div class="ds-hero-label">Total Liquidity</div>
+                    <div class="ds-hero-value" id="dh-liquidity">—</div>
+                </div>
+                <div class="ds-hero-card">
+                    <div class="ds-hero-label">True Wealth</div>
+                    <div class="ds-hero-value" id="dh-truewealth">—</div>
+                </div>
+                <div class="ds-hero-card">
+                    <div class="ds-hero-label">Today's Spend</div>
+                    <div class="ds-hero-value" id="dh-today">—</div>
+                </div>
+            </div>
+            <div class="ds-runway-bar">
+                <div class="ds-runway-item">
+                    <span class="ds-runway-num" id="dh-runway">—</span>
+                    <span class="ds-runway-lbl">months runway</span>
+                </div>
+                <div class="ds-runway-divider"></div>
+                <div class="ds-runway-item">
+                    <span class="ds-runway-num" id="dh-burn">—</span>
+                    <span class="ds-runway-lbl">monthly burn</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Accounts -->
+        <div id="ds-accounts" class="ds-section hidden">
+            <div class="ds-section-hdr">
+                <div class="ds-section-title">Accounts</div>
+                <button class="ds-verify-btn" id="ds-verify-open" type="button">Verify</button>
+            </div>
+            <div id="ds-acct-list" class="ds-acct-list"></div>
+            <!-- Ghost Money Verify Panel (hidden by default) -->
+            <div id="ds-verify-panel" class="ds-verify-panel hidden">
+                <div class="ds-section-title" style="margin-bottom:12px;">Enter actual balances from your banking apps</div>
+                <div id="ds-verify-inputs"></div>
+                <button id="ds-verify-calc" class="ds-verify-calc-btn" type="button">Check Ghost Money</button>
+                <div id="ds-ghost-results" class="hidden"></div>
+            </div>
+        </div>
+
+        <!-- MTD Board -->
+        <div id="ds-mtd" class="ds-section hidden">
+            <div class="ds-section-hdr">
+                <div class="ds-section-title">Month to Date</div>
+                <div class="ds-period-badge" id="ds-mtd-period"></div>
+            </div>
+            <div class="ds-income-row">
+                <span class="ds-income-label">Income</span>
+                <span class="ds-income-value" id="ds-mtd-income">—</span>
+            </div>
+            <div class="ds-buckets" id="ds-mtd-buckets"></div>
+            <div class="ds-cat-grid" id="ds-mtd-cats"></div>
+        </div>
+
+        <!-- YTD Board -->
+        <div id="ds-ytd" class="ds-section hidden">
+            <div class="ds-section-hdr">
+                <div class="ds-section-title">Year to Date</div>
+                <div class="ds-period-badge" id="ds-ytd-period"></div>
+            </div>
+            <div class="ds-income-row">
+                <span class="ds-income-label">Income</span>
+                <span class="ds-income-value" id="ds-ytd-income">—</span>
+            </div>
+            <div class="ds-buckets" id="ds-ytd-buckets"></div>
+            <div class="ds-cat-grid" id="ds-ytd-cats"></div>
+        </div>
+
+        <!-- Escrow / Lending -->
+        <div id="ds-escrow" class="ds-section hidden">
+            <div class="ds-section-title">Escrow / Lending</div>
+            <div id="ds-escrow-list" class="ds-escrow-list"></div>
+        </div>
+
+        <!-- Expense by Month -->
+        <div id="ds-expense" class="ds-section hidden">
+            <div class="ds-section-title">Monthly Expense History</div>
+            <div id="ds-expense-list" class="ds-expense-list"></div>
         </div>
     </div>
 

@@ -448,3 +448,578 @@
             font-size: 9px;
             color: var(--t3);
         }
+
+        /* ── Bottom Navigation ─────────────────────── */
+
+        .bottom-nav {
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            height: 58px;
+            background: var(--s1);
+            border-top: 1px solid var(--b1);
+            display: flex;
+            z-index: 200;
+            max-width: 440px;
+            margin: 0 auto;
+        }
+
+        .nav-btn {
+            flex: 1;
+            background: none;
+            border: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 3px;
+            color: var(--t3);
+            font-family: "DM Mono", monospace;
+            font-size: 10px;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: color 0.15s;
+            padding: 6px 0 8px;
+        }
+
+        .nav-btn.active {
+            color: var(--red);
+        }
+
+        .nav-btn svg {
+            transition: stroke 0.15s;
+        }
+
+        .app {
+            padding-bottom: 70px;
+        }
+
+        /* ── Dashboard Screen ──────────────────────── */
+
+        .ds-section {
+            padding: 0 16px;
+            margin-bottom: 20px;
+        }
+
+        .ds-section-hdr {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .ds-section-title {
+            font-family: "DM Mono", monospace;
+            font-size: 9px;
+            font-weight: 500;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--t3);
+        }
+
+        .ds-state-msg {
+            padding: 20px 16px;
+            font-family: "DM Mono", monospace;
+            font-size: 12px;
+            color: var(--t2);
+            text-align: center;
+        }
+
+        .ds-state-msg.ds-error {
+            color: var(--red);
+        }
+
+        /* Time Machine */
+        .ds-time-machine {
+            padding-top: 4px;
+            margin-bottom: 16px;
+        }
+
+        .ds-tm-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: var(--s2);
+            border: 1px solid var(--b1);
+            border-radius: var(--r);
+            padding: 10px 14px;
+        }
+
+        .ds-tm-label {
+            font-family: "DM Mono", monospace;
+            font-size: 10px;
+            color: var(--t3);
+            letter-spacing: 0.1em;
+            white-space: nowrap;
+        }
+
+        .ds-tm-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+        }
+
+        .tm-select, .tm-input {
+            background: var(--s3);
+            border: 1px solid var(--b2);
+            border-radius: 6px;
+            color: var(--t1);
+            font-family: "DM Mono", monospace;
+            font-size: 12px;
+            padding: 5px 8px;
+            outline: none;
+        }
+
+        .tm-select { flex: 1.2; }
+        .tm-input  { flex: 1; min-width: 0; }
+
+        .tm-go-btn {
+            background: var(--red);
+            color: #fff;
+            border: none;
+            border-radius: 6px;
+            font-family: "DM Mono", monospace;
+            font-size: 11px;
+            font-weight: 500;
+            letter-spacing: 0.08em;
+            padding: 6px 14px;
+            cursor: pointer;
+            transition: opacity 0.15s, transform 0.1s;
+            white-space: nowrap;
+        }
+
+        .tm-go-btn:active { transform: scale(0.95); opacity: 0.85; }
+        .tm-go-btn:disabled { opacity: 0.45; cursor: wait; }
+
+        /* Hero */
+        .ds-hero-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .ds-hero-card {
+            background: var(--s1);
+            border: 1px solid var(--b1);
+            border-radius: var(--rl);
+            padding: 14px 14px 12px;
+            transition: border-color 0.15s;
+        }
+
+        .ds-hero-card.ds-hero-primary {
+            grid-column: 1 / -1;
+            background: var(--s2);
+            border-color: var(--b2);
+        }
+
+        .ds-hero-label {
+            font-family: "DM Mono", monospace;
+            font-size: 9px;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--t3);
+            margin-bottom: 6px;
+        }
+
+        .ds-hero-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--t1);
+            letter-spacing: -0.02em;
+            line-height: 1;
+        }
+
+        .ds-hero-primary .ds-hero-value {
+            font-size: 30px;
+        }
+
+        .ds-runway-bar {
+            background: var(--s1);
+            border: 1px solid var(--b1);
+            border-radius: var(--r);
+            display: flex;
+            align-items: center;
+            padding: 12px 16px;
+            gap: 0;
+        }
+
+        .ds-runway-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+
+        .ds-runway-num {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--t1);
+        }
+
+        .ds-runway-lbl {
+            font-family: "DM Mono", monospace;
+            font-size: 9px;
+            color: var(--t3);
+            letter-spacing: 0.08em;
+        }
+
+        .ds-runway-divider {
+            width: 1px;
+            height: 32px;
+            background: var(--b1);
+            margin: 0 16px;
+        }
+
+        /* Accounts */
+        .ds-acct-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            background: var(--b1);
+            border-radius: var(--r);
+            overflow: hidden;
+        }
+
+        .ds-acct-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--s1);
+            padding: 11px 14px;
+        }
+
+        .ds-acct-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--t1);
+        }
+
+        .ds-acct-bal {
+            font-family: "DM Mono", monospace;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .ds-acct-bal.positive { color: var(--grn); }
+        .ds-acct-bal.negative { color: var(--red); }
+        .ds-acct-bal.zero     { color: var(--t3); }
+
+        /* Verify button */
+        .ds-verify-btn {
+            background: none;
+            border: 1px solid var(--b2);
+            border-radius: 20px;
+            color: var(--t2);
+            font-family: "DM Mono", monospace;
+            font-size: 10px;
+            letter-spacing: 0.08em;
+            padding: 4px 12px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .ds-verify-btn:active { transform: scale(0.95); }
+
+        .ds-verify-panel {
+            margin-top: 14px;
+            padding: 14px;
+            background: var(--s2);
+            border: 1px solid var(--b1);
+            border-radius: var(--r);
+        }
+
+        .ds-verify-input-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .ds-verify-input-name {
+            font-size: 12px;
+            color: var(--t2);
+            flex: 1;
+            min-width: 0;
+        }
+
+        .ds-verify-input-field {
+            width: 110px;
+            background: var(--s3);
+            border: 1px solid var(--b2);
+            border-radius: 6px;
+            color: var(--t1);
+            font-family: "DM Mono", monospace;
+            font-size: 12px;
+            padding: 5px 8px;
+            outline: none;
+            text-align: right;
+        }
+
+        .ds-verify-calc-btn {
+            width: 100%;
+            margin-top: 12px;
+            padding: 10px;
+            background: var(--s3);
+            border: 1px solid var(--b2);
+            border-radius: var(--r);
+            color: var(--t1);
+            font-family: "DM Mono", monospace;
+            font-size: 11px;
+            letter-spacing: 0.08em;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .ds-ghost-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--b1);
+        }
+
+        .ds-ghost-row:last-child { border-bottom: none; }
+
+        .ds-ghost-name { font-size: 12px; color: var(--t2); }
+
+        .ds-ghost-val {
+            font-family: "DM Mono", monospace;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .ds-ghost-val.clean  { color: var(--grn); }
+        .ds-ghost-val.low    { color: var(--t2); }
+        .ds-ghost-val.high   { color: var(--red); }
+
+        /* Income row */
+        .ds-income-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0 14px;
+            border-bottom: 1px solid var(--b1);
+            margin-bottom: 12px;
+        }
+
+        .ds-income-label {
+            font-family: "DM Mono", monospace;
+            font-size: 10px;
+            color: var(--t3);
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+        }
+
+        .ds-income-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--grn);
+        }
+
+        /* Buckets */
+        .ds-buckets {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 16px;
+        }
+
+        .ds-bucket {
+            background: var(--s1);
+            border: 1px solid var(--b1);
+            border-radius: var(--r);
+            padding: 12px 14px;
+        }
+
+        .ds-bucket-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            margin-bottom: 8px;
+        }
+
+        .ds-bucket-name {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--t1);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .ds-bucket-meta {
+            font-family: "DM Mono", monospace;
+            font-size: 10px;
+            color: var(--t3);
+        }
+
+        .ds-bucket-bar-bg {
+            height: 4px;
+            background: var(--s3);
+            border-radius: 2px;
+            overflow: hidden;
+            margin-bottom: 8px;
+        }
+
+        .ds-bucket-bar-fill {
+            height: 100%;
+            border-radius: 2px;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .ds-bucket-bar-fill.ok      { background: var(--grn); }
+        .ds-bucket-bar-fill.warn    { background: #f59e0b; }
+        .ds-bucket-bar-fill.over    { background: var(--red); }
+
+        .ds-bucket-nums {
+            display: flex;
+            justify-content: space-between;
+            font-family: "DM Mono", monospace;
+            font-size: 11px;
+        }
+
+        .ds-bucket-spent  { color: var(--t1); font-weight: 500; }
+        .ds-bucket-remain { }
+        .ds-bucket-remain.positive { color: var(--grn); }
+        .ds-bucket-remain.negative { color: var(--red); }
+
+        /* Period badge */
+        .ds-period-badge {
+            font-family: "DM Mono", monospace;
+            font-size: 10px;
+            color: var(--t2);
+            background: var(--s2);
+            border: 1px solid var(--b1);
+            border-radius: 20px;
+            padding: 3px 10px;
+        }
+
+        /* Category grid */
+        .ds-cat-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            background: var(--b1);
+            border-radius: var(--r);
+            overflow: hidden;
+        }
+
+        .ds-cat-row {
+            display: flex;
+            align-items: flex-start;
+            background: var(--s1);
+            padding: 10px 14px;
+            gap: 12px;
+            cursor: pointer;
+            transition: background 0.1s;
+        }
+
+        .ds-cat-row:active { background: var(--s2); }
+
+        .ds-cat-name {
+            font-size: 12px;
+            color: var(--t1);
+            font-weight: 500;
+            flex: 0 0 100px;
+            min-width: 0;
+        }
+
+        .ds-cat-amt {
+            font-family: "DM Mono", monospace;
+            font-size: 12px;
+            color: var(--t2);
+            flex: 0 0 70px;
+            text-align: right;
+        }
+
+        .ds-cat-desc {
+            font-family: "DM Mono", monospace;
+            font-size: 10px;
+            color: var(--t3);
+            flex: 1;
+            min-width: 0;
+            line-height: 1.5;
+            word-break: break-word;
+        }
+
+        .ds-cat-desc.collapsed {
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        /* Escrow */
+        .ds-escrow-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            background: var(--b1);
+            border-radius: var(--r);
+            overflow: hidden;
+        }
+
+        .ds-escrow-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--s1);
+            padding: 11px 14px;
+        }
+
+        .ds-escrow-person { font-size: 13px; font-weight: 600; color: var(--t1); }
+
+        .ds-escrow-right {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 2px;
+        }
+
+        .ds-escrow-pos {
+            font-family: "DM Mono", monospace;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .ds-escrow-pos.owe  { color: var(--red); }
+        .ds-escrow-pos.owed { color: var(--grn); }
+        .ds-escrow-pos.zero { color: var(--t3); }
+
+        .ds-escrow-date {
+            font-family: "DM Mono", monospace;
+            font-size: 9px;
+            color: var(--t3);
+        }
+
+        /* Expense History */
+        .ds-expense-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            background: var(--b1);
+            border-radius: var(--r);
+            overflow: hidden;
+        }
+
+        .ds-exp-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--s1);
+            padding: 10px 14px;
+        }
+
+        .ds-exp-period {
+            font-family: "DM Mono", monospace;
+            font-size: 12px;
+            color: var(--t2);
+        }
+
+        .ds-exp-total {
+            font-family: "DM Mono", monospace;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--t1);
+        }
