@@ -11,21 +11,20 @@ let CONFIG = null;
         let isSyncing = false;
 
         const ICONS = {
-            'Investments': 'INV',
-            'Transport': 'TRN',
-            'Utilities': 'UTL',
-            'Income': 'INC',
-            'Dining & Lifestyle': 'DINE',
-            'Health': 'HLT',
-            'Education': 'EDU',
-            'Groceries': 'GRC',
-            'Home Projects': 'HOME',
-            'Relationships': 'REL',
-            'Escrow / Lending': 'ESC',
-            'Mandate': 'MAN',
-            'Adjustment': 'ADJ',
-            'Transfer (Self)': 'XFR',
-            'Vice': 'VCE',
+            'Income':            'INC',
+            'Groceries':         'GRC',
+            'Transport':         'TRN',
+            'Utilities':         'UTL',
+            'Health':            'HLT',
+            'Education':         'EDU',
+            'Dining & Lifestyle':'DINE',
+            'Relationships':     'REL',
+            'Vice':              'VCE',
+            'Overheads':         'OVH',
+            'Investments':       'INV',
+            'Escrow / Lending':  'ESC',
+            'Transfer (Self)':   'XFR',
+            'Adjustment':        'ADJ',
         };
 
         const st = {
