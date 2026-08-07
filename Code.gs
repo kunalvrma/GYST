@@ -87,8 +87,10 @@ function getHudConfig() {
   const settings = getOrCreateSettingsSheet_(ss);
 
   return {
+    // Accounts remain sheet-driven (vary per user setup)
     accounts: getSettingsList_(settings, 'Accounts', MONEYFLOW.DEFAULT_ACCOUNTS),
-    categories: getSettingsList_(settings, 'Categories', MONEYFLOW.DEFAULT_CATEGORIES),
+    // Categories are hardcoded — 14 final categories, never read from HUDSettings
+    categories: MONEYFLOW.DEFAULT_CATEGORIES,
     flows: MONEYFLOW.FLOW_TYPES,
     defaults: {
       account: '',
