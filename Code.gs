@@ -2,6 +2,7 @@ const MONEYFLOW = {
   SPREADSHEET_ID: '',
   TRANSACTIONS_SHEET_NAME: 'HUDLogs',
   SETTINGS_SHEET_NAME: 'HUDSettings',
+  DASHBOARD_SHEET_NAME: 'Dashboard',
   DEFAULT_HEADERS: [
     'Timestamp',
     'Account',
@@ -26,21 +27,20 @@ const MONEYFLOW = {
   },
   DEFAULT_ACCOUNTS: ['Cash', 'UBI', 'Kotak811', 'SBI', 'Zerodha', 'Axis'],
   DEFAULT_CATEGORIES: [
-    'Investments',
+    'Income',
+    'Groceries',
     'Transport',
     'Utilities',
-    'Income',
-    'Dining & Lifestyle',
     'Health',
     'Education',
-    'Groceries',
-    'Home Projects',
+    'Dining & Lifestyle',
     'Relationships',
-    'Escrow / Lending',
-    'Mandate',
-    'Adjustment',
-    'Transfer (Self)',
     'Vice',
+    'Overheads',
+    'Investments',
+    'Escrow / Lending',
+    'Transfer (Self)',
+    'Adjustment',
   ],
   FLOW_TYPES: [
     { value: 'IN (+)', label: 'IN +', cls: 'in' },
@@ -68,6 +68,10 @@ function doPost(e) {
         .setMimeType(ContentService.MimeType.JSON);
     } else if (payload.action === 'submitEntry') {
       const result = submitEntry(payload.data);
+      return ContentService.createTextOutput(JSON.stringify({ ok: true, data: result }))
+        .setMimeType(ContentService.MimeType.JSON);
+    } else if (payload.action === 'getSnapshot') {
+      const result = getSnapshot(payload.data || {});
       return ContentService.createTextOutput(JSON.stringify({ ok: true, data: result }))
         .setMimeType(ContentService.MimeType.JSON);
     }
@@ -341,4 +345,137 @@ function normalizeHeader_(value) {
 
 function sameHeader_(left, right) {
   return normalizeHeader_(left) === normalizeHeader_(right);
+}
+
+// ─── Dashboard Snapshot ───────────────────────────────────────────────────────
+
+/**
+ * Reads computed values from the Dashboard sheet and returns a structured
+ * JSON snapshot for the HUD Dashboard view.
+ *
+ * Accepts optional { month, year } in params for Time Machine mode.
+ * If provided, writes the selectors, flushes, reads results, then returns.
+ *
+ * Called via doPost with action: 'getSnapshot'.
+ */
+function getSnapshot(params) {
+  const ss = getSpreadsheet_();
+  const dash = ss.getSheetByName(MONEYFLOW.DASHBOARD_SHEET_NAME);
+  if (!dash) throw new Error('Dashboard sheet not found.');
+
+  // ── Time Machine: write selectors if caller specified a period ──
+  const hasTimeMachine = params && params.month && params.year;
+  if (hasTimeMachine) {
+    dash.getRange('M11').setValue(Number(params.month)); // MTD month
+    dash.getRange('N11').setValue(Number(params.year));  // MTD year
+    dash.getRange('N34').setValue(Number(params.year));  // YTD year
+    SpreadsheetApp.flush();                              // force recalc
+  }
+
+  // ── Read current selector values (so HUD always knows what period is shown) ──
+  const mtdMonth = dash.getRange('M11').getValue();
+  const mtdYear  = dash.getRange('N11').getValue();
+  const ytdYear  = dash.getRange('N34').getValue();
+
+  // ── Hero ──
+  const hero = {
+    netWorth:       dash.getRange('B4').getValue(),
+    totalLiquidity: dash.getRange('G4').getValue(),
+    todayExpense:   dash.getRange('I4').getValue(),
+    trueWealth:     dash.getRange('G7').getValue(),
+    runway:         dash.getRange('I6').getValue(),
+    monthlyBurn:    dash.getRange('N7').getValue(),
+  };
+
+  // ── Liquidity Accounts (B13:D19, up to 15 rows, skip blanks) ──
+  const accountData = dash.getRange('B13:D27').getValues(); // 15-row cap
+  const accounts = [];
+  accountData.forEach(function(row) {
+    const name = cleanString_(row[0]);
+    if (name) {
+      accounts.push({ name: name, balance: row[1] });
+    }
+  });
+
+  // ── MTD Board ──
+  const mtd = {
+    period: { month: mtdMonth, year: mtdYear },
+    income: dash.getRange('N13').getValue(),
+    buckets: {
+      survival: { allowance: dash.getRange('H15').getValue(), spent: dash.getRange('K15').getValue(), remaining: dash.getRange('M15').getValue() },
+      wealth:   { allowance: dash.getRange('H16').getValue(), spent: dash.getRange('K16').getValue(), remaining: dash.getRange('M16').getValue() },
+      wants:    { allowance: dash.getRange('H17').getValue(), spent: dash.getRange('K17').getValue(), remaining: dash.getRange('M17').getValue() },
+    },
+    categories: readCategoryRows_(dash, 'G21:H31', 'M21:M31'),
+  };
+
+  // ── YTD Board ──
+  const ytd = {
+    period: { year: ytdYear },
+    income: dash.getRange('N36').getValue(),
+    buckets: {
+      survival: { spent: dash.getRange('H38').getValue(), pct: dash.getRange('K38').getValue(), target: 0.45 },
+      wealth:   { spent: dash.getRange('H39').getValue(), pct: dash.getRange('K39').getValue(), target: 0.30 },
+      wants:    { spent: dash.getRange('H40').getValue(), pct: dash.getRange('K40').getValue(), target: 0.25 },
+    },
+    categories: readCategoryRows_(dash, 'G44:H54', 'M44:M54'),
+  };
+
+  // ── Escrow / Lending (B31:D35, spill — up to 15 rows, skip header + blanks) ──
+  const escrowRaw = dash.getRange('B31:D46').getValues(); // header + up to 15 entries
+  const escrow = [];
+  escrowRaw.forEach(function(row, i) {
+    if (i === 0) return; // skip header row
+    const person = cleanString_(row[0]);
+    if (person) {
+      escrow.push({
+        person:      person,
+        netPosition: row[1],
+        asOf:        row[2] ? new Date(row[2]).toISOString() : null,
+      });
+    }
+  });
+
+  // ── Expense by Month (B50:D68+, spill — read until blank) ──
+  const expenseRaw = dash.getRange('B50:D100').getValues();
+  const expenseByMonth = [];
+  expenseRaw.forEach(function(row, i) {
+    if (i === 0) return; // skip header row
+    const year = row[0];
+    if (!year || year === 'Year') return;
+    expenseByMonth.push({ year: year, month: row[1], total: row[2] });
+  });
+
+  return {
+    generatedAt: new Date().toISOString(),
+    hero,
+    accounts,
+    mtd,
+    ytd,
+    escrow,
+    expenseByMonth,
+  };
+}
+
+/**
+ * Reads a block of category rows from the Dashboard.
+ * labelRange: e.g. 'G21:H31' — col1 = category name, col2 = description
+ * amountRange: e.g. 'M21:M31' — single column of amounts
+ * Returns array of { category, amount, description }
+ */
+function readCategoryRows_(dash, labelRange, amountRange) {
+  const labels  = dash.getRange(labelRange).getValues();
+  const amounts = dash.getRange(amountRange).getValues();
+  const result  = [];
+  labels.forEach(function(row, i) {
+    const cat = cleanString_(row[0]);
+    if (cat) {
+      result.push({
+        category:    cat,
+        description: cleanString_(row[1]),
+        amount:      amounts[i][0] || 0,
+      });
+    }
+  });
+  return result;
 }
