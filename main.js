@@ -326,9 +326,9 @@ let CONFIG = null;
 
             BUCKET_GROUPS.forEach(group => {
                 let cats = group.cats;
-                if (st.flowVal === 'IN') {
+                if (st.flowVal === 'IN (+)') {
                     cats = cats.filter(c => ['Income', 'Escrow / Lending', 'Adjustment'].includes(c));
-                } else if (st.flowVal === 'OUT') {
+                } else if (st.flowVal === 'OUT (-)') {
                     cats = cats.filter(c => c !== 'Income');
                 }
 
@@ -380,9 +380,9 @@ let CONFIG = null;
             st.flowCls = flow.cls;
             
             // Clear st.cat if it is invalid for the new flow
-            if (st.flowVal === 'IN' && !['Income', 'Escrow / Lending', 'Adjustment'].includes(st.cat)) {
+            if (st.flowVal === 'IN (+)' && !['Income', 'Escrow / Lending', 'Adjustment'].includes(st.cat)) {
                 st.cat = null;
-            } else if (st.flowVal === 'OUT' && st.cat === 'Income') {
+            } else if (st.flowVal === 'OUT (-)' && st.cat === 'Income') {
                 st.cat = null;
             }
             if (st.flowCls === 'tr') {
