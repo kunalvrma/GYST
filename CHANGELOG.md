@@ -17,6 +17,9 @@ All notable changes to the GYST personal finance system are documented here.
 - **PWA Install Prompt** — `beforeinstallprompt` is captured and a native install banner appears on supported browsers (Android/Chrome). iOS users see manual "Add to Home Screen" instructions. Install state is persisted to localStorage to suppress the banner after install.
 - **Config Version / Cache Busting** — `getHudConfig()` now returns a `version` field (`v2.1`). The HUD compares this on load and clears the config cache if the server version has changed, ensuring users always get fresh categories/settings after a Code.gs deployment.
 - **MasterLog BudgetGroup column** — ARRAYFORMULA in column J of MasterLog maps each category to its BudgetGroup (Survival/Wealth/Wants/OneOff/Nonspend). Prepared for future direct MasterLog queries.
+- **Flow-Specific Categories** — Log Entry form dynamically hides irrelevant categories based on the selected Flow (e.g., IN hides everything except Income, Escrow, and Adjustment).
+- **Tag Suggestion Engine** — "Person / Tag" field now features the same suggestion chip system as the Description field, tracking frequently used tags per Flow+Account+Category combination.
+- **Grouped Category Grid** — Categories are now clustered into 5 distinct groups (Nonspend, One-Off, Wealth, Survival, Wants) with vertical side-labels and subtle per-group color tints. Ordered top-to-bottom for optimized mobile thumb reach.
 
 ### Changed
 
@@ -30,6 +33,8 @@ All notable changes to the GYST personal finance system are documented here.
 - **Negative net worth display** — `fmtRs()` now shows `−₹` prefix for negative values instead of stripping the sign. Net Worth hero card gets a red `.negative` CSS class when below zero.
 - **MTD bucket zero-income guard** — `renderBuckets()` guards against division by zero when MTD income is ₹0 (start of month). Bars show 0% cleanly instead of NaN.
 - **Runway `.toFixed()` crash** — Guarded `h.runway` with `Number()` cast before calling `.toFixed(1)` to prevent crashes if the value is returned as a string.
+- **Accounts save performance** — Removed `SpreadsheetApp.flush()` from `updateAccounts` endpoint, cutting save time from 60 seconds to 2–5 seconds by no longer blocking the HUD while Dashboard formulas recalculate.
+- **HUDSettings column bug** — Fixed initialization bug that incorrectly created "Categories" columns in `HUDSettings`. `updateAccounts` now features a self-healing routine that deletes extra columns and cleanly preserves only Column A for accounts.
 
 ## [2026-08-08]
 
