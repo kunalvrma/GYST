@@ -117,13 +117,21 @@ function updateAccounts_(accounts) {
   const ss = getSpreadsheet_();
   const settings = getOrCreateSettingsSheet_(ss);
 
-  // Preserve the "Accounts" header in A1, clear A2 downward
+  // Self-heal: delete any extra columns beyond col A that were auto-created by previous bug.
+  const lastCol = settings.getLastColumn();
+  if (lastCol > 1) {
+    settings.deleteColumns(2, lastCol - 1);
+  }
+
+  // Ensure A1 always has the "Accounts" header.
+  settings.getRange(1, 1).setValue('Accounts');
+
+  // Clear A2 downward, then write new list.
   const lastRow = settings.getLastRow();
   if (lastRow >= 2) {
     settings.getRange(2, 1, lastRow - 1, 1).clearContent();
   }
 
-  // Write new list
   const valid = accounts.map(a => String(a).trim()).filter(Boolean);
   if (valid.length > 0) {
     settings.getRange(2, 1, valid.length, 1).setValues(valid.map(a => [a]));
@@ -304,19 +312,14 @@ function setByKey_(row, headerMap, key, value) {
 function getOrCreateSettingsSheet_(ss) {
   let sheet = ss.getSheetByName(MONEYFLOW.SETTINGS_SHEET_NAME);
   if (!sheet) {
-    // First-time setup: create HUDSettings with Accounts column only.
-    // Categories are hardcoded server-side and never stored in the sheet.
+    // First-time setup: col A = Accounts only. Categories are hardcoded.
     sheet = ss.insertSheet(MONEYFLOW.SETTINGS_SHEET_NAME);
     sheet.getRange(1, 1).setValue('Accounts');
-    sheet.getRange(2, 1, MONEYFLOW.DEFAULT_ACCOUNTS.length, 1).setValues(
-      MONEYFLOW.DEFAULT_ACCOUNTS.map(function (item) { return [item]; })
-    );
+    sheet.getRange(2, 1, MONEYFLOW.DEFAULT_ACCOUNTS.length, 1)
+      .setValues(MONEYFLOW.DEFAULT_ACCOUNTS.map(a => [a]));
     sheet.setFrozenRows(1);
     sheet.autoResizeColumns(1, 1);
   }
-
-  // Only ensure the Accounts column exists — never touch Categories.
-  ensureSettingsColumn_(sheet, 'Accounts', MONEYFLOW.DEFAULT_ACCOUNTS);
   return sheet;
 }
 
@@ -332,12 +335,16 @@ function ensureSettingsColumn_(sheet, header, defaults) {
   return newColumn;
 }
 
+/**
+ * Reads the accounts list directly from col A rows 2+.
+ * Falls back to DEFAULT_ACCOUNTS if the column is empty.
+ * Never auto-creates or touches any other column.
+ */
 function getSettingsList_(sheet, header, defaults) {
-  // Use findHeaderColumn_ (not ensureSettingsColumn_) so we never
-  // auto-create a missing column as a side effect of reading.
-  const column = findHeaderColumn_(sheet, header) || ensureSettingsColumn_(sheet, header, defaults);
-  const lastRow = Math.max(sheet.getLastRow(), defaults.length + 1);
-  const values = sheet.getRange(2, column, lastRow - 1, 1)
+  const lastRow = sheet.getLastRow();
+  if (lastRow < 2) return defaults;
+
+  const values = sheet.getRange(2, 1, lastRow - 1, 1)
     .getValues()
     .map(function (row) { return cleanString_(row[0]); })
     .filter(Boolean);
