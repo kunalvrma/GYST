@@ -28,21 +28,22 @@ let CONFIG = null;
             'Adjustment':        'ADJ',
         };
 
-        // Category groups — defines display order, grouping, and color class.
-        // Vice is last in Wants (end of a perfect 3-item row). Investments and
-        // Overheads are single-item groups — rendered full-width intentionally.
+        // Category groups — ordered bottom-first for mobile thumb reach.
+        // Bottom of list = easiest to tap. Wants (Vice) at bottom.
         const BUCKET_GROUPS = [
+            { label: 'Nonspend', cls: 'grp-nonspend',
+              cats: ['Income', 'Escrow / Lending', 'Transfer (Self)', 'Adjustment'] },
+            { label: 'One-Off',  cls: 'grp-oneoff',
+              cats: ['Overheads'] },
+            { label: 'Wealth',   cls: 'grp-wealth',
+              cats: ['Investments'] },
             { label: 'Survival', cls: 'grp-survival',
               cats: ['Groceries', 'Transport', 'Utilities', 'Health', 'Education'] },
             { label: 'Wants',    cls: 'grp-wants',
               cats: ['Dining & Lifestyle', 'Relationships', 'Vice'] },
-            { label: 'Wealth',   cls: 'grp-wealth',
-              cats: ['Investments'] },
-            { label: 'One-Off',  cls: 'grp-oneoff',
-              cats: ['Overheads'] },
-            { label: 'Nonspend', cls: 'grp-nonspend',
-              cats: ['Income', 'Escrow / Lending', 'Transfer (Self)', 'Adjustment'] },
         ];
+
+        const TAG_KEY = 'mf_tags'; // stored tags for person/tag suggestions
 
         const st = {
             flowVal: null,
@@ -324,6 +325,15 @@ let CONFIG = null;
             grid.innerHTML = '';
 
             BUCKET_GROUPS.forEach(group => {
+                let cats = group.cats;
+                if (st.flowVal === 'IN') {
+                    cats = cats.filter(c => ['Income', 'Escrow / Lending', 'Adjustment'].includes(c));
+                } else if (st.flowVal === 'OUT') {
+                    cats = cats.filter(c => c !== 'Income');
+                }
+
+                if (cats.length === 0) return;
+
                 // Outer wrapper: label + button sub-grid
                 const wrapper = document.createElement('div');
                 wrapper.className = 'cat-grp-wrapper';
@@ -338,8 +348,8 @@ let CONFIG = null;
                 const subGrid = document.createElement('div');
                 subGrid.className = 'cat-grp-buttons';
 
-                const count = group.cats.length;
-                group.cats.forEach((category, idx) => {
+                const count = cats.length;
+                cats.forEach((category, idx) => {
                     const btn = document.createElement('button');
                     btn.type = 'button';
                     btn.className = `cb ${group.cls}`;
@@ -368,9 +378,20 @@ let CONFIG = null;
         function setFlow(flow) {
             st.flowVal = flow.value;
             st.flowCls = flow.cls;
-            st.cat = st.flowCls === 'tr' ? CONFIG.defaults.transferCategory : null;
+            
+            // Clear st.cat if it is invalid for the new flow
+            if (st.flowVal === 'IN' && !['Income', 'Escrow / Lending', 'Adjustment'].includes(st.cat)) {
+                st.cat = null;
+            } else if (st.flowVal === 'OUT' && st.cat === 'Income') {
+                st.cat = null;
+            }
+            if (st.flowCls === 'tr') {
+                st.cat = CONFIG.defaults.transferCategory;
+            }
+
             st.dest = st.flowCls === 'tr' ? st.dest : null;
             applyFlowState();
+            renderCategoryButtons();
             renderSuggestions();
         }
 
@@ -446,6 +467,7 @@ let CONFIG = null;
             toast('Logged', 'ok');
             
             saveSuggestion(st.flowVal, st.account, st.cat, desc);
+            saveTagSuggestion(st.flowVal, st.account, st.cat, tag);
             savePattern(amountRaw, st.flowVal, st.account, st.cat, st.dest, desc, tag);
             
             setTimeout(resetForm, 400);
@@ -572,16 +594,14 @@ let CONFIG = null;
         }
 
         function getSuggData() {
-            try {
-                return JSON.parse(localStorage.getItem(SUGG_KEY) || '{}');
-            } catch (error) {
-                return {};
-            }
+            try { return JSON.parse(localStorage.getItem(SUGG_KEY) || '{}'); } catch { return {}; }
         }
+        function setSuggData(data) { localStorage.setItem(SUGG_KEY, JSON.stringify(data)); }
 
-        function setSuggData(data) {
-            localStorage.setItem(SUGG_KEY, JSON.stringify(data));
+        function getTagSuggData() {
+            try { return JSON.parse(localStorage.getItem(TAG_KEY) || '{}'); } catch { return {}; }
         }
+        function setTagSuggData(data) { localStorage.setItem(TAG_KEY, JSON.stringify(data)); }
 
         function trimSuggCombo(combo) {
             return Object.fromEntries(
@@ -599,40 +619,84 @@ let CONFIG = null;
             setSuggData(data);
         }
 
+        function saveTagSuggestion(flow, account, cat, tag) {
+            if (!tag || !cat) return;
+            const data = getTagSuggData();
+            const key = `${flow}|${account}|${cat}`;
+            if (!data[key]) data[key] = {};
+            data[key][tag] = (data[key][tag] || 0) + 1;
+            data[key] = trimSuggCombo(data[key]);
+            setTagSuggData(data);
+        }
+
         function renderSuggestions() {
-            const row = document.getElementById('sugg-row');
-            row.innerHTML = '';
+            const descRow = document.getElementById('sugg-row');
+            const tagRow = document.getElementById('tag-sugg-row');
+            
+            descRow.innerHTML = '';
+            if (tagRow) tagRow.innerHTML = '';
+
             if (!st.cat) {
-                row.classList.add('hidden');
+                descRow.classList.add('hidden');
+                if (tagRow) tagRow.classList.add('hidden');
                 return;
             }
 
-            const data = getSuggData();
-            const combo = data[`${st.flowVal}|${st.account}|${st.cat}`];
-            if (!combo) {
-                row.classList.add('hidden');
-                return;
+            const key = `${st.flowVal}|${st.account}|${st.cat}`;
+            
+            // Description suggestions
+            const descData = getSuggData();
+            const descCombo = descData[key];
+            if (!descCombo) {
+                descRow.classList.add('hidden');
+            } else {
+                const topDesc = Object.entries(descCombo).sort((a, b) => b[1] - a[1]).slice(0, 5);
+                if (!topDesc.length) {
+                    descRow.classList.add('hidden');
+                } else {
+                    topDesc.forEach(([desc]) => {
+                        const chip = document.createElement('button');
+                        chip.type = 'button';
+                        chip.className = 'sc';
+                        chip.textContent = desc;
+                        chip.addEventListener('click', () => {
+                            document.getElementById('desc').value = desc;
+                            descRow.querySelectorAll('.sc').forEach(item => item.classList.remove('picked'));
+                            chip.classList.add('picked');
+                        });
+                        descRow.appendChild(chip);
+                    });
+                    descRow.classList.remove('hidden');
+                }
             }
 
-            const top = Object.entries(combo).sort((a, b) => b[1] - a[1]).slice(0, 5);
-            if (!top.length) {
-                row.classList.add('hidden');
-                return;
+            // Tag suggestions
+            if (tagRow) {
+                const tagData = getTagSuggData();
+                const tagCombo = tagData[key];
+                if (!tagCombo) {
+                    tagRow.classList.add('hidden');
+                } else {
+                    const topTag = Object.entries(tagCombo).sort((a, b) => b[1] - a[1]).slice(0, 5);
+                    if (!topTag.length) {
+                        tagRow.classList.add('hidden');
+                    } else {
+                        topTag.forEach(([tag]) => {
+                            const chip = document.createElement('button');
+                            chip.type = 'button';
+                            chip.className = 'sc';
+                            chip.textContent = tag;
+                            chip.addEventListener('click', () => {
+                                document.getElementById('tag').value = tag;
+                                tagRow.querySelectorAll('.sc').forEach(item => item.classList.remove('picked'));
+                                chip.classList.add('picked');
+                            });
+                            tagRow.appendChild(chip);
+                        });
+                        tagRow.classList.remove('hidden');
+                    }
+                }
             }
-
-            top.forEach(([desc]) => {
-                const chip = document.createElement('button');
-                chip.type = 'button';
-                chip.className = 'sc';
-                chip.textContent = desc;
-                chip.addEventListener('click', () => {
-                    document.getElementById('desc').value = desc;
-                    row.querySelectorAll('.sc').forEach(item => item.classList.remove('picked'));
-                    chip.classList.add('picked');
-                });
-                row.appendChild(chip);
-            });
-            row.classList.remove('hidden');
         }
 
         let toastTimer;
