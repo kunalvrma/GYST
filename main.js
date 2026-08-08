@@ -117,7 +117,10 @@ let CONFIG = null;
             const isOpening = !drawer.classList.contains('open');
             overlay.classList.toggle('open');
             drawer.classList.toggle('open');
-            if (isOpening) renderHistory();
+            if (isOpening) {
+                renderHistory();
+                openDrawerPanel('main');
+            }
         }
 
         document.addEventListener('DOMContentLoaded', () => {

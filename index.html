@@ -31,6 +31,12 @@
             <img src="logo-transparent-bg.png" alt="GYST Logo" style="height:96px; display:block; margin:0 auto 8px;">
             <span style="font-size:15px; color:var(--t2); font-weight:500;">money<em>Flow</em></span>
         </div>
+        <!-- Install banner shows here on Android before connecting -->
+        <div id="install-banner" class="install-banner hidden" style="text-align:left; margin:0 0 20px;">
+            <span class="install-banner-text">Add GYST to your home screen for the best experience.</span>
+            <button class="install-banner-btn" onclick="window._triggerInstall()">Install</button>
+            <button class="install-banner-dismiss" onclick="this.closest('.install-banner').classList.add('hidden'); localStorage.setItem('gyst_installed','1');">&#215;</button>
+        </div>
         <h2 style="font-size:18px; margin-bottom:12px; font-weight:700; color:var(--t1);">Ready to get your shit together?</h2>
         <p style="font-size:13px; color:var(--t2); margin-bottom:28px; line-height:1.6; padding:0 10px;">
             No aesthetic templates. No guilt trips. Just log your transactions and move on.<br><br>
