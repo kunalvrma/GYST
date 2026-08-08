@@ -172,9 +172,42 @@
             grid-template-columns: repeat(3, 1fr);
         }
 
-        /* 14 categories: last item falls in pos 2 of row 5 — span it to fill pos 3 */
-        .cat-row .cb:last-child:nth-child(3n+2) {
-            grid-column: span 2;
+        /* Category group section header — spans all 3 columns */
+        .cat-grp-hdr {
+            grid-column: 1 / -1;
+            font-family: 'DM Mono', monospace;
+            font-size: 9px;
+            font-weight: 500;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--t3);
+            padding: 8px 0 4px;
+            border-bottom: 1px solid var(--b1);
+            margin-top: 4px;
+        }
+
+        .cat-grp-hdr:first-child { margin-top: 0; padding-top: 0; }
+
+        /* Per-group subtle tints — only when NOT selected */
+        .cb.grp-survival:not(.on) {
+            background: hsla(160, 55%, 45%, 0.07);
+            border-color: hsla(160, 55%, 45%, 0.30);
+        }
+        .cb.grp-wants:not(.on) {
+            background: hsla(30, 75%, 55%, 0.07);
+            border-color: hsla(30, 75%, 55%, 0.30);
+        }
+        .cb.grp-wealth:not(.on) {
+            background: hsla(220, 65%, 60%, 0.07);
+            border-color: hsla(220, 65%, 60%, 0.30);
+        }
+        .cb.grp-oneoff:not(.on) {
+            background: hsla(280, 45%, 60%, 0.07);
+            border-color: hsla(280, 45%, 60%, 0.30);
+        }
+        .cb.grp-nonspend:not(.on) {
+            background: hsla(0, 0%, 50%, 0.05);
+            border-color: hsla(0, 0%, 55%, 0.22);
         }
 
         button {

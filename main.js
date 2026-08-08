@@ -28,6 +28,22 @@ let CONFIG = null;
             'Adjustment':        'ADJ',
         };
 
+        // Category groups — defines display order, grouping, and color class.
+        // Vice is last in Wants (end of a perfect 3-item row). Investments and
+        // Overheads are single-item groups — rendered full-width intentionally.
+        const BUCKET_GROUPS = [
+            { label: 'Survival', cls: 'grp-survival',
+              cats: ['Groceries', 'Transport', 'Utilities', 'Health', 'Education'] },
+            { label: 'Wants',    cls: 'grp-wants',
+              cats: ['Dining & Lifestyle', 'Relationships', 'Vice'] },
+            { label: 'Wealth',   cls: 'grp-wealth',
+              cats: ['Investments'] },
+            { label: 'One-Off',  cls: 'grp-oneoff',
+              cats: ['Overheads'] },
+            { label: 'Nonspend', cls: 'grp-nonspend',
+              cats: ['Income', 'Escrow / Lending', 'Transfer (Self)', 'Adjustment'] },
+        ];
+
         const st = {
             flowVal: null,
             flowCls: null,
@@ -306,17 +322,36 @@ let CONFIG = null;
         function renderCategoryButtons() {
             const grid = document.getElementById('cat-grid');
             grid.innerHTML = '';
-            CONFIG.categories.forEach(category => {
-                const btn = document.createElement('button');
-                btn.type = 'button';
-                btn.className = 'cb';
-                btn.dataset.value = category;
-                btn.innerHTML = '<span class="i"></span><span></span>';
-                btn.querySelector('.i').textContent = ICONS[category] || 'CAT';
-                btn.querySelector('span:last-child').textContent = category;
-                btn.classList.toggle('on', category === st.cat);
-                btn.addEventListener('click', () => setCat(category));
-                grid.appendChild(btn);
+
+            BUCKET_GROUPS.forEach(group => {
+                // Section header — spans all 3 columns
+                const hdr = document.createElement('div');
+                hdr.className = 'cat-grp-hdr';
+                hdr.textContent = group.label;
+                grid.appendChild(hdr);
+
+                const count = group.cats.length;
+                group.cats.forEach((category, idx) => {
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = `cb ${group.cls}`;
+                    btn.dataset.value = category;
+                    btn.innerHTML = '<span class="i"></span><span></span>';
+                    btn.querySelector('.i').textContent = ICONS[category] || '···';
+                    btn.querySelector('span:last-child').textContent = category;
+                    btn.classList.toggle('on', category === st.cat);
+                    btn.addEventListener('click', () => setCat(category));
+
+                    // Last item span logic: fill empty cols in the row
+                    if (idx === count - 1) {
+                        const rem = count % 3;
+                        if (rem === 1) btn.style.gridColumn = 'span 3'; // full-width
+                        if (rem === 2) btn.style.gridColumn = 'span 2'; // fill 2 of 3
+                        // rem === 0: perfect row, no span
+                    }
+
+                    grid.appendChild(btn);
+                });
             });
         }
 
