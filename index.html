@@ -51,19 +51,110 @@
     <!-- Hamburger Drawer -->
     <div id="drawer-overlay" class="drawer-overlay"></div>
     <div id="drawer" class="drawer">
-        <div style="font-size:18px; font-weight:700; margin-bottom:32px;">Settings</div>
-        <button class="drawer-btn" id="theme-toggle-btn">Toggle Light/Dark Mode</button>
-        <button class="drawer-btn" id="drawer-reset-btn" style="color:var(--red);">Reset Database Link</button>
-        <div class="drawer-history">
-            <div class="drawer-history-lbl">Recent</div>
-            <div id="history-list" class="history-list"></div>
-            <div id="history-empty" class="history-empty">No entries yet</div>
+
+        <!-- Main Panel -->
+        <div id="drawer-main" class="drawer-panel">
+            <div class="drawer-hdr">Menu</div>
+            <button class="drawer-btn" id="theme-toggle-btn">Toggle Light / Dark</button>
+            <button class="drawer-btn" id="drawer-accounts-btn">Manage Accounts</button>
+            <button class="drawer-btn" id="drawer-guide-btn">How to Use</button>
+            <button class="drawer-btn" id="drawer-faq-btn">FAQ</button>
+            <button class="drawer-btn" id="drawer-about-btn">About GYST</button>
+            <button class="drawer-btn" id="drawer-reset-btn" style="color:var(--red);">Reset Database Link</button>
+            <div class="drawer-history">
+                <div class="drawer-history-lbl">Recent</div>
+                <div id="history-list" class="history-list"></div>
+                <div id="history-empty" class="history-empty">No entries yet</div>
+            </div>
+            <div style="flex:1"></div>
+            <div style="font-size:10px; color:var(--t3); margin-top:20px; font-family:'DM Mono', monospace;" id="app-version">v2.1</div>
         </div>
-        <div style="flex:1"></div>
-        <button class="drawer-btn" style="border:none; color:var(--t3); font-size:11px;">Privacy Policy</button>
-        <button class="drawer-btn" style="border:none; color:var(--t3); font-size:11px;">Terms & Conditions</button>
-        <button class="drawer-btn" style="border:none; color:var(--t3); font-size:11px;">Contact Us</button>
-        <div style="font-size:10px; color:var(--t3); margin-top:20px; font-family:'DM Mono', monospace;">v1.0.0</div>
+
+        <!-- Accounts Sub-Panel -->
+        <div id="drawer-accounts" class="drawer-panel hidden">
+            <div class="drawer-sub-hdr">
+                <button class="drawer-back-btn" id="accounts-back-btn">&#8592;</button>
+                <span>Accounts</span>
+            </div>
+            <div class="drawer-sub-body">
+                <div class="drawer-sub-lbl">Your accounts (Cash, Banks, Cards, Investments)</div>
+                <div id="acct-mgr-list"></div>
+                <div class="acct-add-row">
+                    <input id="acct-new-input" class="ti" type="text" placeholder="New account name..." autocomplete="off">
+                    <button id="acct-add-btn" class="acct-add-btn" type="button">Add</button>
+                </div>
+                <button id="acct-save-btn" class="acct-save-btn" type="button">Save Changes</button>
+                <div id="acct-save-msg" class="acct-save-msg hidden"></div>
+            </div>
+        </div>
+
+        <!-- Guide Sub-Panel -->
+        <div id="drawer-guide" class="drawer-panel hidden">
+            <div class="drawer-sub-hdr">
+                <button class="drawer-back-btn" id="guide-back-btn">&#8592;</button>
+                <span>How to Use</span>
+            </div>
+            <div class="drawer-sub-body drawer-prose">
+                <h3>The 5-second habit</h3>
+                <p>Money flows &rarr; you log it. That's the whole system. Open GYST, pick the type, amount, account, category, done.</p>
+                <h3>Flow Types</h3>
+                <p><strong>OUT (−)</strong> — Money leaving you. Groceries, rent, Netflix.<br>
+                <strong>IN (+)</strong> — Money coming in. Salary, freelance, cashback.<br>
+                <strong>TRANSFER</strong> — Money moving between your own accounts. UPI top-up, FD deposit.</p>
+                <h3>Budget Groups</h3>
+                <p><strong>Survival</strong> — Groceries, Transport, Utilities, Health, Education. Non-negotiable spending.<br>
+                <strong>Wealth</strong> — Investments. Money that works for you.<br>
+                <strong>Wants</strong> — Dining, Relationships, Vice. Quality of life spending.<br>
+                <strong>OneOff</strong> — Overheads. One-time or irregular expenses.<br>
+                <strong>Nonspend</strong> — Transfers, Lending, Adjustments. Not real spending.</p>
+                <h3>The Dashboard</h3>
+                <p>Tap Dashboard &rarr; see your net worth, account balances, and spending breakdown. Use the Time Machine to check any past month.</p>
+                <h3>Ghost Money</h3>
+                <p>Your GYST balance and your bank app will diverge over time. That's normal. Use the Verify button in Accounts to find the gap, then log an Adjustment to reconcile.</p>
+            </div>
+        </div>
+
+        <!-- FAQ Sub-Panel -->
+        <div id="drawer-faq" class="drawer-panel hidden">
+            <div class="drawer-sub-hdr">
+                <button class="drawer-back-btn" id="faq-back-btn">&#8592;</button>
+                <span>FAQ</span>
+            </div>
+            <div class="drawer-sub-body drawer-prose">
+                <h3>I forgot to log something. Is it ruined?</h3>
+                <p>No. Log it now with the actual amount. GYST doesn't care when you logged it — only what you logged. The numbers will correct themselves.</p>
+                <h3>My balance doesn't match my bank. What do I do?</h3>
+                <p>Use Dashboard &rarr; Accounts &rarr; Verify. Enter your real balance. The difference is ghost money — log an Adjustment entry to reconcile.</p>
+                <h3>What's the difference between Escrow / Lending and Transfer?</h3>
+                <p>Escrow / Lending is money that left your account but isn't truly spent — it will (should) come back. Transfer is moving money between your own accounts — it's not an expense at all.</p>
+                <h3>How do I add a new bank account?</h3>
+                <p>Menu &rarr; Manage Accounts &rarr; Add the account &rarr; Save. It will appear everywhere automatically.</p>
+                <h3>Can I edit a logged entry?</h3>
+                <p>Not from the HUD yet. You can edit directly in the HUDLogs tab of your Google Sheet if absolutely needed. Don't touch any other tab.</p>
+                <h3>What is Adjustment?</h3>
+                <p>A correction entry. Use it to account for interest, cashback, rounding differences, or ghost money write-offs. It keeps your books clean without cluttering your real expense categories.</p>
+            </div>
+        </div>
+
+        <!-- About Sub-Panel -->
+        <div id="drawer-about" class="drawer-panel hidden">
+            <div class="drawer-sub-hdr">
+                <button class="drawer-back-btn" id="about-back-btn">&#8592;</button>
+                <span>About</span>
+            </div>
+            <div class="drawer-sub-body drawer-prose">
+                <h3>GYST — moneyFlow</h3>
+                <p>A personal finance system built for imperfect humans.</p>
+                <p>Built with Google Sheets as the engine and a fast web app as the interface. No subscriptions. No servers. Your data lives in your own Google Sheet — private by design.</p>
+                <h3>Philosophy</h3>
+                <p>Most finance tools fail because they assume you are disciplined, consistent, and never forget anything. GYST assumes the opposite — and keeps working anyway.</p>
+                <p>The only discipline it requires: log transactions when money moves.</p>
+                <div style="margin-top:24px; padding-top:16px; border-top:1px solid var(--b1);">
+                    <div style="font-family:'DM Mono',monospace; font-size:10px; color:var(--t3); line-height:2;">Built by Kunal Verma<br>Version: <span id="about-version">v2.1</span></div>
+                </div>
+            </div>
+        </div>
+
     </div>
 
     <!-- Bottom Nav (shown when app is connected) -->
@@ -262,6 +353,36 @@
     </div>
 
     <script type="module" src="/main.js"></script>
+    <script>
+        // Register Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js').catch(() => {});
+            });
+        }
+
+        // PWA Install Prompt
+        let _deferredPrompt = null;
+        window.addEventListener('beforeinstallprompt', e => {
+            e.preventDefault();
+            _deferredPrompt = e;
+            const banner = document.getElementById('install-banner');
+            if (banner && !localStorage.getItem('gyst_installed')) {
+                banner.classList.remove('hidden');
+            }
+        });
+        window.addEventListener('appinstalled', () => {
+            localStorage.setItem('gyst_installed', '1');
+            const banner = document.getElementById('install-banner');
+            if (banner) banner.classList.add('hidden');
+        });
+        window._triggerInstall = function() {
+            if (_deferredPrompt) {
+                _deferredPrompt.prompt();
+                _deferredPrompt.userChoice.then(() => { _deferredPrompt = null; });
+            }
+        };
+    </script>
 </body>
 
 </html>

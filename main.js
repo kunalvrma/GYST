@@ -6,6 +6,7 @@ let CONFIG = null;
         const CONFIG_CACHE_KEY = 'mf_config';
         const THEME_KEY = 'mf_theme';
         const HISTORY_KEY = 'mf_history';
+        const HUD_VERSION = 'v2.1';
         let API_URL = localStorage.getItem(API_KEY_STORE);
         let initialized = false;
         let isSyncing = false;
@@ -139,6 +140,18 @@ let CONFIG = null;
                 document.getElementById('tm-go').addEventListener('click', fetchSnapshot);
                 document.getElementById('ds-verify-open').addEventListener('click', toggleVerifyPanel);
                 document.getElementById('ds-verify-calc').addEventListener('click', calcGhostMoney);
+                // Drawer sub-panels
+                document.getElementById('drawer-accounts-btn').addEventListener('click', () => openDrawerPanel('accounts'));
+                document.getElementById('drawer-guide-btn').addEventListener('click', () => openDrawerPanel('guide'));
+                document.getElementById('drawer-faq-btn').addEventListener('click', () => openDrawerPanel('faq'));
+                document.getElementById('drawer-about-btn').addEventListener('click', () => openDrawerPanel('about'));
+                document.getElementById('accounts-back-btn').addEventListener('click', () => openDrawerPanel('main'));
+                document.getElementById('guide-back-btn').addEventListener('click', () => openDrawerPanel('main'));
+                document.getElementById('faq-back-btn').addEventListener('click', () => openDrawerPanel('main'));
+                document.getElementById('about-back-btn').addEventListener('click', () => openDrawerPanel('main'));
+                document.getElementById('acct-add-btn').addEventListener('click', acctMgrAdd);
+                document.getElementById('acct-save-btn').addEventListener('click', acctMgrSave);
+                document.getElementById('acct-new-input').addEventListener('keydown', e => { if (e.key === 'Enter') acctMgrAdd(); });
                 initialized = true;
             }
             
@@ -170,6 +183,12 @@ let CONFIG = null;
                 .then(r => r.json())
                 .then(res => {
                     if (res.ok && res.data) {
+                        // Version check — if server version changed, bust the cache
+                        const cachedCfg = CONFIG;
+                        const serverVersion = res.data.version;
+                        if (cachedCfg && serverVersion && cachedCfg.version !== serverVersion) {
+                            localStorage.removeItem(CONFIG_CACHE_KEY);
+                        }
                         const newConfigStr = JSON.stringify(res.data);
                         if (newConfigStr !== cached) {
                             CONFIG = res.data;
@@ -746,11 +765,14 @@ let CONFIG = null;
         }
 
         function renderHero(h) {
-            document.getElementById('dh-networth').textContent   = fmtRs(h.netWorth);
+            const nw = Number(h.netWorth) || 0;
+            const nwEl = document.getElementById('dh-networth');
+            nwEl.textContent = fmtRs(nw);
+            nwEl.className = 'ds-hero-value' + (nw < 0 ? ' negative' : '');
             document.getElementById('dh-liquidity').textContent  = fmtRs(h.totalLiquidity);
             document.getElementById('dh-truewealth').textContent = fmtRs(h.trueWealth);
             document.getElementById('dh-today').textContent      = fmtRs(h.todayExpense);
-            document.getElementById('dh-runway').textContent     = h.runway > 999 ? '999+' : h.runway.toFixed(1);
+            document.getElementById('dh-runway').textContent     = h.runway > 999 ? '999+' : Number(h.runway).toFixed(1);
             document.getElementById('dh-burn').textContent       = fmtRs(Math.round(h.monthlyBurn));
             dsShow('ds-hero');
         }
@@ -957,7 +979,9 @@ let CONFIG = null;
 
         function fmtRs(val) {
             const n = Number(val) || 0;
-            return '₹' + Math.abs(n).toLocaleString('en-IN', { maximumFractionDigits: 0 });
+            const abs = Math.abs(n);
+            const str = '₹' + abs.toLocaleString('en-IN', { maximumFractionDigits: 0 });
+            return n < 0 ? '\u2212' + str : str;
         }
 
         function esc(str) {
@@ -966,3 +990,98 @@ let CONFIG = null;
 
         function dsShow(id) { document.getElementById(id).classList.remove('hidden'); }
         function dsHide(id) { document.getElementById(id).classList.add('hidden'); }
+
+        // ── Drawer Panel Navigation ───────────────────────────────────
+
+        const DRAWER_PANELS = ['main', 'accounts', 'guide', 'faq', 'about'];
+
+        function openDrawerPanel(name) {
+            DRAWER_PANELS.forEach(p => {
+                const el = document.getElementById('drawer-' + p);
+                if (el) el.classList.toggle('hidden', p !== name);
+            });
+            if (name === 'accounts') renderAcctMgr();
+        }
+
+        // Reset to main panel whenever drawer is opened
+        const _origToggleDrawer = toggleDrawer;
+
+        // ── Accounts Manager ─────────────────────────────────────────
+
+        let _acctList = [];
+
+        function renderAcctMgr() {
+            _acctList = CONFIG && CONFIG.accounts ? [...CONFIG.accounts] : [];
+            _paintAcctMgr();
+        }
+
+        function _paintAcctMgr() {
+            const list = document.getElementById('acct-mgr-list');
+            list.innerHTML = '';
+            _acctList.forEach((name, idx) => {
+                const item = document.createElement('div');
+                item.className = 'acct-mgr-item';
+                item.innerHTML = `<span class="acct-mgr-name">${esc(name)}</span>
+                    <button class="acct-del-btn" data-idx="${idx}" type="button" title="Remove">&#215;</button>`;
+                list.appendChild(item);
+            });
+            list.querySelectorAll('.acct-del-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const idx = parseInt(btn.dataset.idx, 10);
+                    _acctList.splice(idx, 1);
+                    _paintAcctMgr();
+                });
+            });
+        }
+
+        function acctMgrAdd() {
+            const input = document.getElementById('acct-new-input');
+            const val = input.value.trim();
+            if (!val) return;
+            if (_acctList.map(a => a.toLowerCase()).includes(val.toLowerCase())) {
+                input.value = '';
+                return;
+            }
+            _acctList.push(val);
+            input.value = '';
+            _paintAcctMgr();
+        }
+
+        async function acctMgrSave() {
+            if (!API_URL) return;
+            const saveBtn = document.getElementById('acct-save-btn');
+            const msg = document.getElementById('acct-save-msg');
+            saveBtn.disabled = true;
+            saveBtn.textContent = 'Saving...';
+            msg.className = 'acct-save-msg hidden';
+
+            try {
+                const res = await fetch(API_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ action: 'updateAccounts', data: _acctList }),
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' }
+                }).then(r => r.json());
+
+                saveBtn.disabled = false;
+                saveBtn.textContent = 'Save Changes';
+
+                if (!res.ok) throw new Error(res.error || 'Save failed');
+
+                // Update live config cache so Log Entry form reflects change immediately
+                if (CONFIG) {
+                    CONFIG.accounts = [..._acctList];
+                    localStorage.setItem(CONFIG_CACHE_KEY, JSON.stringify(CONFIG));
+                    renderAccountButtons('acct-grid', setAcct, st.account);
+                    renderAccountButtons('dest-grid', setDest, st.dest);
+                }
+
+                msg.textContent = `Saved ${res.data.updated} accounts`;
+                msg.className = 'acct-save-msg ok';
+                setTimeout(() => msg.classList.add('hidden'), 3000);
+            } catch (err) {
+                saveBtn.disabled = false;
+                saveBtn.textContent = 'Save Changes';
+                msg.textContent = err.message;
+                msg.className = 'acct-save-msg err';
+            }
+        }

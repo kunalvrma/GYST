@@ -1,8 +1,8 @@
 {
   "name": "gyst",
-  "version": "1.0.0",
-  "description": "**A personal finance system built for imperfect humans.**",
-  "main": "index.js",
+  "version": "2.1.0",
+  "description": "A personal finance system built for imperfect humans.",
+  "main": "index.html",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "vite build"
@@ -14,7 +14,6 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "type": "commonjs",
   "bugs": {
     "url": "https://github.com/kunalvrma/GYST/issues"
   },

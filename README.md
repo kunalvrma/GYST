@@ -1,154 +1,107 @@
-# Get Your Shit Together (GYST) System
+# GYST — moneyFlow
 
 **A personal finance system built for imperfect humans.**
 
-A few years ago I noticed something mildly disturbing.
-I was earning money… but somehow it kept disappearing.
-
-Not in a dramatic way. Nothing illegal. No fraud. Just the classic quiet mystery of adult life:
-
 > *"Where the hell did my money go?"*
 
-So I did what everyone does — I tried fixing it with tools.
+Most finance tools fail because they assume you are disciplined, consistent, and never forget anything. GYST assumes the opposite — and keeps working anyway.
 
-* Budgeting apps
-* Expense trackers
-* Spreadsheets
-* A few extremely aesthetic Notion templates made by people who apparently never forget to log a ₹15 chai.
-
-Every single one of them failed for the same reason. They assumed life behaves nicely.
-
-**Life does not behave nicely.**
-
-The problem wasn't discipline. The problem was systems designed for perfect humans.
-
-So instead of trying to become more disciplined, I built a system that assumes you're imperfect and keeps working anyway — something that quietly helps you get your shit together.
-
-## What I Actually Needed
-
-Turns out I didn't need a complex finance system. I only needed answers to four simple questions:
-
-* How much money do I actually have?
-* Who owes me money?
-* Who do I owe money to?
-* Where is my money generally going?
-
-That's it. Not twenty dashboards. Not 300 categories. Just clarity.
-
-I also added two simple time views: **Month-to-date (MTD)** and **Year-to-date (YTD)**. Enough to see patterns without turning this into a CA internship.
+The only discipline it requires: **log transactions when money moves.**
 
 ---
 
-## Initial Setup (Do this once and never again)
+## How It Works
 
-Since Google's native screens take 5 seconds to load (which is 4 seconds too long), the GYST HUD is hosted externally to be lightning-fast.
+Built on two boring tools — Google Sheets and Google Apps Script. Boring tools are good. They tend to work.
 
-1. Open **Extensions > Apps Script** in your Google Sheet and deploy it as a "Web App". Copy the URL it gives you.
-2. Open the GYST HUD website on your phone.
-3. Paste the URL to securely connect your private database.
-4. "Add to Home Screen" on your phone. You now have a blazing fast native app.
-
-### The HUD Experience
-We didn't just build a form; we built a progressive web app that actually respects your time:
-* **Instant Loading:** Your setup is cached locally. You don't stare at a "Connecting..." screen every time you open the app.
-* **Offline Sync:** Life doesn't always have 5G. If you log a transaction in a basement or on a flight, the HUD quietly queues it up and syncs it the second your connection returns. No data lost. No accidental double-entries.
-* **Aesthetics:** Smooth micro-animations, a clean sidebar menu, and a Light/Dark mode toggle (though Dark Mode is obviously superior).
+- **Google Sheet** — your private database. Stores every transaction and does all the math. Lives in your Google Drive. Nobody else has access.
+- **moneyFlow HUD** — a fast web app (this repo) that gives you a clean interface to log entries and see your financial picture. Loads in under a second.
 
 ---
 
-## How GYST Works
+## Setup (One-time)
 
-The system is built using two extremely boring tools — Google Sheets and Google Apps Script. Boring tools are good. They tend to work.
+1. **Get the template** — Make a copy of the [GYST Google Sheet template](#) into your Google Drive.
+2. **Deploy the script** — Inside the sheet: *Extensions → Apps Script → Deploy → New Deployment → Web App*. Set "Who has access" to "Anyone". Copy the URL.
+3. **Connect the HUD** — Open [gystmoneyflow.vercel.app](https://gystmoneyflow.vercel.app), paste the URL, tap Link.
+4. **Add to Home Screen** — On Android: tap the browser menu → *Add to Home Screen*. On iOS: tap Share → *Add to Home Screen*. You now have a native-feeling app.
 
-**Step 1:** A dashboard in Google Sheets lists every place where money exists — Kotak, Axis, SBI, Cash, FDs (yes, cash and fixed deposits are accounts too). This becomes the financial control panel.
-
-**Step 2:** Whenever money moves, open the HUD and log the transaction. Takes about five seconds.
-
-Money moving includes:
-* Buying something
-* Receiving income
-* Lending money
-* Repaying someone
-* Someone paying you back
-
-Once the form is submitted, everything else happens automatically. Balances update. Loans update. Spending patterns update. Net worth updates. You don't maintain anything. You just log and move on.
+That's it. You never open the sheet again for daily use.
 
 ---
 
-## About Human Imperfection
+## Features
 
-Here's an important truth: **You will forget to log things.** Everyone does.
+### Log Entry (5 seconds)
+Pick flow type (In / Out / Transfer), amount, account, category. Optional description and person/tag. Hit log. Done.
 
-Maybe you forgot a ₹1 cashback. Maybe the bank credited ₹12 interest. Maybe you bought chai and didn't bother logging it.
+### Dashboard
+Full financial snapshot — fetched on demand, always current:
+- **Hero** — Net Worth, Total Liquidity, True Wealth, Today's Spend, Runway, Monthly Burn
+- **Accounts** — All account balances with Ghost Money verification
+- **MTD Board** — Month-to-date spending by BudgetGroup (progress bars) and per category
+- **YTD Board** — Year-to-date with income percentage targets
+- **Escrow / Lending** — Who owes you, who you owe
+- **Monthly Expense History** — Rolling history
 
-Eventually the numbers between your sheet and your bank account won't match. This is normal. I call this **ghost money**.
+### Time Machine
+Change the month/year in the Dashboard to see any past period's data. The sheet recalculates and returns historical numbers.
 
-Most finance systems break when ghost money appears. GYST doesn't panic.
+### Ghost Money
+Bank balance doesn't match GYST? Tap **Verify** in Accounts, enter your real balances, see the discrepancy per account. Log an Adjustment to reconcile.
 
-Whenever you want to reconcile, open the dashboard and check your real bank balances. If numbers don't match, you have two options:
+### Offline Sync
+Log entries with no connection. They queue locally and sync automatically when you're back online. No duplicates, no data loss.
 
-* **Option 1 — Go full detective:** search the logs, find the missing transaction, enter it properly.
-* **Option 2 — Behave like a normal human:** use the Adjustments category, write off the ghost money, and move on.
+### Manage Accounts
+Add or remove accounts directly from the app menu. No Sheet interaction needed.
 
-System fixed. Life continues.
+---
+
+## Budget Groups
+
+| Group | Categories | Logic |
+|---|---|---|
+| **Survival** | Groceries, Transport, Utilities, Health, Education | Non-negotiable |
+| **Wealth** | Investments | Money working for you |
+| **Wants** | Dining & Lifestyle, Relationships, Vice | Quality of life |
+| **OneOff** | Overheads | Irregular/one-time |
+| **Nonspend** | Escrow/Lending, Transfer (Self), Adjustment, Income | Not real spending |
 
 ---
 
 ## Sheet Structure
 
-The sheet has six tabs. Each one exists for a specific reason.
-
-### Dashboard
-The only tab you'll actually look at most of the time. Shows account balances, net worth, loans given/taken, spending summaries, and MTD/YTD numbers. Think of it as the financial mirror.
-
-### Vault
-Not connected to calculations. Simply stores references for important things like insurance policies, policy numbers, and coverage notes. Future-you will appreciate this.
-
-### HUDSettings
-You add your Accounts and Categories (already added but customizable) from here.
-
-### HUDLogs
-Stores all raw logs coming from the HUD. You do not touch this tab. Seriously. Leave it alone.
-
-### MasterLog
-Where the spreadsheet does its internal math. Converts raw logs into something the dashboard can understand. Not a tab you should edit.
-
-### ReadMe
-This tab. Exists for the day when you open the sheet months later and wonder what past-you was thinking.
+| Tab | Purpose | Touch it? |
+|---|---|---|
+| `Dashboard` | Calculation engine. Formulas derive all metrics from MasterLog. | No |
+| `HUDSettings` | Account list. Managed from the app. | Only if needed |
+| `HUDLogs` | Raw transaction log. Every entry from the HUD lands here. | No |
+| `MasterLog` | Computed log with FINAL_MATH. Source of truth for all Dashboard formulas. | No |
 
 ---
 
-## Daily Usage (Very Complicated)
+## Philosophy
 
-**Money flows → log it.** That's it.
+GYST tracks spending **intention-wise**, not transaction-wise.
 
-Examples:
-* You bought something
-* You received income
-* You lent money
-* Someone repaid you
+A ₹500 Amazon order is Overheads. A ₹500 dinner is Dining. The category reflects *why* you spent, not *where* you spent it. This makes the numbers honest and the patterns clear.
 
-**Open the form → Log the transaction → Five seconds → Everything else happens automatically.**
+Ghost money is expected. Imperfect logging is expected. The system absorbs both without breaking.
 
 ---
 
-## The Only Discipline Required
+## Tech Stack
 
-You don't need to:
-* Track expenses every day
-* Manually calculate balances
-* Review finances constantly
-
-**You only need to do one thing: Log transactions when money moves.**
-
-If you do that consistently, the system takes care of the rest.
+- **Frontend** — Vanilla HTML / CSS / JS. No framework. Deployed on Vercel.
+- **Backend** — Google Apps Script (bound to user's Sheet). Handles auth, reads, writes, and the snapshot API.
+- **Database** — User's private Google Sheet. Zero third-party storage.
+- **PWA** — Service worker, install prompt, offline support.
 
 ---
 
-## Final Thought
+## Privacy
 
-Money management should not require daily spreadsheet rituals, complex budgeting systems, or financial anxiety.
+Your data never leaves your Google account. The HUD talks directly to your Apps Script deployment using the URL you provide. There is no central server, no database, no account system.
 
-GYST simply records reality. Whenever you want clarity, open the dashboard. The numbers will be there.
-
-And sometimes they will gently remind you to get your shit together. Which, in case it wasn't obvious by now, is the entire gist of GYST.
+The URL is stored only in your browser's localStorage.

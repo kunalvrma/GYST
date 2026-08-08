@@ -47,6 +47,7 @@ const MONEYFLOW = {
     { value: 'OUT (-)', label: 'OUT -', cls: 'out' },
     { value: 'TRANSFER', label: 'TRANSFER', cls: 'tr' },
   ],
+  CONFIG_VERSION: 'v2.1',
 };
 
 function doGet(e) {
@@ -74,6 +75,10 @@ function doPost(e) {
       const result = getSnapshot(payload.data || {});
       return ContentService.createTextOutput(JSON.stringify({ ok: true, data: result }))
         .setMimeType(ContentService.MimeType.JSON);
+    } else if (payload.action === 'updateAccounts') {
+      const result = updateAccounts_(payload.data || []);
+      return ContentService.createTextOutput(JSON.stringify({ ok: true, data: result }))
+        .setMimeType(ContentService.MimeType.JSON);
     }
     throw new Error('Unknown action: ' + payload.action);
   } catch (error) {
@@ -87,6 +92,7 @@ function getHudConfig() {
   const settings = getOrCreateSettingsSheet_(ss);
 
   return {
+    version: MONEYFLOW.CONFIG_VERSION,
     // Accounts remain sheet-driven (vary per user setup)
     accounts: getSettingsList_(settings, 'Accounts', MONEYFLOW.DEFAULT_ACCOUNTS),
     // Categories are hardcoded — 14 final categories, never read from HUDSettings
@@ -100,6 +106,33 @@ function getHudConfig() {
     },
   };
 }
+
+/**
+ * Writes a new accounts list to HUDSettings!A:A.
+ * Called from HUD Accounts management panel.
+ * @param {string[]} accounts - Ordered list of account names.
+ */
+function updateAccounts_(accounts) {
+  if (!Array.isArray(accounts)) throw new Error('accounts must be an array');
+  const ss = getSpreadsheet_();
+  const settings = getOrCreateSettingsSheet_(ss);
+
+  // Preserve the "Accounts" header in A1, clear A2 downward
+  const lastRow = settings.getLastRow();
+  if (lastRow >= 2) {
+    settings.getRange(2, 1, lastRow - 1, 1).clearContent();
+  }
+
+  // Write new list
+  const valid = accounts.map(a => String(a).trim()).filter(Boolean);
+  if (valid.length > 0) {
+    settings.getRange(2, 1, valid.length, 1).setValues(valid.map(a => [a]));
+  }
+
+  SpreadsheetApp.flush();
+  return { updated: valid.length };
+}
+
 
 function submitEntry(payload) {
   const entry = normalizeEntry_(payload);

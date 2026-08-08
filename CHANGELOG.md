@@ -4,6 +4,33 @@ All notable changes to the GYST personal finance system are documented here.
 
 ---
 
+## [2026-08-08] — v2.1
+
+### Added
+
+- **In-app Multi-Panel Drawer** — Hamburger menu now has sub-panels: Manage Accounts, How to Use (Guide), FAQ, and About. Each slides in with a back button. No more placeholder footer links.
+- **In-app Guide** — Explains flow types, budget groups, the dashboard, and ghost money. Lives in the drawer, always accessible.
+- **In-app FAQ** — Answers the 6 most common questions (forgot to log, balance mismatch, escrow vs transfer, adding accounts, editing entries, Adjustment category).
+- **In-app About** — Product description, philosophy, version number.
+- **Manage Accounts from HUD** — Users can add and remove accounts directly from the drawer without ever opening the Google Sheet. Changes write to HUDSettings via the new `updateAccounts` API endpoint and refresh the Log Entry form instantly.
+- **Service Worker (PWA)** — Full offline support. App shell is cached on install. Stale-while-revalidate for assets. API calls always bypass the cache.
+- **PWA Install Prompt** — `beforeinstallprompt` is captured and a native install banner appears on supported browsers (Android/Chrome). iOS users see manual "Add to Home Screen" instructions. Install state is persisted to localStorage to suppress the banner after install.
+- **Config Version / Cache Busting** — `getHudConfig()` now returns a `version` field (`v2.1`). The HUD compares this on load and clears the config cache if the server version has changed, ensuring users always get fresh categories/settings after a Code.gs deployment.
+- **MasterLog BudgetGroup column** — ARRAYFORMULA in column J of MasterLog maps each category to its BudgetGroup (Survival/Wealth/Wants/OneOff/Nonspend). Prepared for future direct MasterLog queries.
+
+### Changed
+
+- **`updateAccounts` endpoint** — New `doPost` action writes account list to HUDSettings, enabling HUD-side account management.
+- **manifest.json** — Added `orientation: portrait`, `categories: ["finance","productivity"]`, maskable icon purpose. App name updated to `GYST — moneyFlow`.
+- **README.md** — Complete rewrite. Accurate for current architecture: HUD-first, 4 sheet tabs, all features documented, privacy model explained.
+- **package.json** — Version bumped to `2.1.0`. Fixed `main` entry. Removed incorrect `"type": "commonjs"`.
+
+### Fixed
+
+- **Negative net worth display** — `fmtRs()` now shows `−₹` prefix for negative values instead of stripping the sign. Net Worth hero card gets a red `.negative` CSS class when below zero.
+- **MTD bucket zero-income guard** — `renderBuckets()` guards against division by zero when MTD income is ₹0 (start of month). Bars show 0% cleanly instead of NaN.
+- **Runway `.toFixed()` crash** — Guarded `h.runway` with `Number()` cast before calling `.toFixed(1)` to prevent crashes if the value is returned as a string.
+
 ## [2026-08-08]
 
 ### Added
