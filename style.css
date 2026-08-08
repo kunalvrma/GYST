@@ -169,45 +169,70 @@
         }
 
         .cat-row {
-            grid-template-columns: repeat(3, 1fr);
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
         }
 
-        /* Category group section header — spans all 3 columns */
-        .cat-grp-hdr {
-            grid-column: 1 / -1;
+        /* Group wrapper: vertical label + button sub-grid side by side */
+        .cat-grp-wrapper {
+            display: flex;
+            gap: 5px;
+            align-items: stretch;
+        }
+
+        /* Vertical rotated group label */
+        .cat-grp-lbl {
+            width: 12px;
+            flex-shrink: 0;
+            writing-mode: vertical-rl;
+            transform: rotate(180deg);
             font-family: 'DM Mono', monospace;
-            font-size: 9px;
+            font-size: 8px;
             font-weight: 500;
-            letter-spacing: 0.12em;
+            letter-spacing: 0.10em;
             text-transform: uppercase;
-            color: var(--t3);
-            padding: 8px 0 4px;
-            border-bottom: 1px solid var(--b1);
-            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 3px;
+            opacity: 0.55;
         }
 
-        .cat-grp-hdr:first-child { margin-top: 0; padding-top: 0; }
+        .cat-grp-lbl.grp-survival { color: hsl(160, 55%, 45%); }
+        .cat-grp-lbl.grp-wants    { color: hsl(30,  75%, 55%); }
+        .cat-grp-lbl.grp-wealth   { color: hsl(220, 65%, 60%); }
+        .cat-grp-lbl.grp-oneoff   { color: hsl(280, 45%, 60%); }
+        .cat-grp-lbl.grp-nonspend { color: hsl(0,   0%,  50%); }
 
-        /* Per-group subtle tints — only when NOT selected */
+        /* 3-col button sub-grid inside each group */
+        .cat-grp-buttons {
+            flex: 1;
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 7px;
+        }
+
+        /* Per-group button tints — only when NOT selected */
         .cb.grp-survival:not(.on) {
             background: hsla(160, 55%, 45%, 0.07);
-            border-color: hsla(160, 55%, 45%, 0.30);
+            border-color: hsla(160, 55%, 45%, 0.28);
         }
         .cb.grp-wants:not(.on) {
             background: hsla(30, 75%, 55%, 0.07);
-            border-color: hsla(30, 75%, 55%, 0.30);
+            border-color: hsla(30, 75%, 55%, 0.28);
         }
         .cb.grp-wealth:not(.on) {
             background: hsla(220, 65%, 60%, 0.07);
-            border-color: hsla(220, 65%, 60%, 0.30);
+            border-color: hsla(220, 65%, 60%, 0.28);
         }
         .cb.grp-oneoff:not(.on) {
             background: hsla(280, 45%, 60%, 0.07);
-            border-color: hsla(280, 45%, 60%, 0.30);
+            border-color: hsla(280, 45%, 60%, 0.28);
         }
         .cb.grp-nonspend:not(.on) {
             background: hsla(0, 0%, 50%, 0.05);
-            border-color: hsla(0, 0%, 55%, 0.22);
+            border-color: hsla(0, 0%, 55%, 0.20);
         }
 
         button {

@@ -324,11 +324,19 @@ let CONFIG = null;
             grid.innerHTML = '';
 
             BUCKET_GROUPS.forEach(group => {
-                // Section header — spans all 3 columns
-                const hdr = document.createElement('div');
-                hdr.className = 'cat-grp-hdr';
-                hdr.textContent = group.label;
-                grid.appendChild(hdr);
+                // Outer wrapper: label + button sub-grid
+                const wrapper = document.createElement('div');
+                wrapper.className = 'cat-grp-wrapper';
+
+                // Vertical label
+                const lbl = document.createElement('div');
+                lbl.className = `cat-grp-lbl ${group.cls}`;
+                lbl.textContent = group.label;
+                wrapper.appendChild(lbl);
+
+                // 3-col sub-grid for buttons
+                const subGrid = document.createElement('div');
+                subGrid.className = 'cat-grp-buttons';
 
                 const count = group.cats.length;
                 group.cats.forEach((category, idx) => {
@@ -342,16 +350,18 @@ let CONFIG = null;
                     btn.classList.toggle('on', category === st.cat);
                     btn.addEventListener('click', () => setCat(category));
 
-                    // Last item span logic: fill empty cols in the row
+                    // Span last item to fill incomplete row
                     if (idx === count - 1) {
                         const rem = count % 3;
-                        if (rem === 1) btn.style.gridColumn = 'span 3'; // full-width
-                        if (rem === 2) btn.style.gridColumn = 'span 2'; // fill 2 of 3
-                        // rem === 0: perfect row, no span
+                        if (rem === 1) btn.style.gridColumn = 'span 3';
+                        if (rem === 2) btn.style.gridColumn = 'span 2';
                     }
 
-                    grid.appendChild(btn);
+                    subGrid.appendChild(btn);
                 });
+
+                wrapper.appendChild(subGrid);
+                grid.appendChild(wrapper);
             });
         }
 
