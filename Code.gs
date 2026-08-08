@@ -137,7 +137,8 @@ function updateAccounts_(accounts) {
     settings.getRange(2, 1, valid.length, 1).setValues(valid.map(a => [a]));
   }
 
-  SpreadsheetApp.flush();
+  // No flush() here — avoid blocking on Dashboard formula recalculation.
+  // Apps Script commits the write at function end automatically.
   return { updated: valid.length };
 }
 

@@ -169,7 +169,12 @@
         }
 
         .cat-row {
-            grid-template-columns: repeat(2, 1fr);
+            grid-template-columns: repeat(3, 1fr);
+        }
+
+        /* 14 categories: last item falls in pos 2 of row 5 — span it to fill pos 3 */
+        .cat-row .cb:last-child:nth-child(3n+2) {
+            grid-column: span 2;
         }
 
         button {
