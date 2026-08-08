@@ -4,6 +4,37 @@ All notable changes to the GYST personal finance system are documented here.
 
 ---
 
+## [2026-08-08]
+
+### Added
+
+- **HUD Dashboard View** — The HUD now has a full Dashboard screen accessible via a bottom tab bar (Log / Dashboard). Users never need to open the Google Sheet again. The Dashboard renders 7 sections: Hero, Accounts, MTD Board, YTD Board, Escrow/Lending, Monthly Expense History, and the Ghost Money Verify panel.
+- **Bottom Tab Navigation** — A persistent bottom nav bar (Log + Dashboard) appears once the app is connected. Tapping Dashboard auto-fetches the current period snapshot.
+- **Time Machine** — Dashboard includes a Month/Year selector. Selecting a past period writes the selector cells in the Sheet, forces a recalculation, and returns the historically accurate data for that period. Full analysis capability now lives inside the HUD, not the Sheet.
+- **Ghost Money Verify Panel** — Accounts section now has a "Verify" button. Tapping it reveals an input panel where the user enters actual balances from their banking app. The HUD calculates the discrepancy per account instantly (client-side, zero sheet writes). Green = clean, red = investigate.
+- **MTD/YTD BudgetGroup Progress Bars** — The MTD board shows Survival, Wealth, and Wants as animated progress bars with allowance, spent, and remaining. Green < 75%, amber < 100%, red = over budget. YTD shows the same groups as percentage-of-income vs target.
+- **Per-Category Expense Niche** — Each category row in MTD/YTD shows name, amount, and a collapsible description (tap to expand/collapse) showing the actual sub-descriptions logged (e.g. "bakery ₹90 | snacks ₹21").
+- **`getSnapshot` endpoint in Code.gs** — New `doPost` action that reads ~40 computed cell values from the Dashboard sheet and returns a structured JSON payload covering all 7 dashboard sections.
+
+### Changed
+
+- **Dashboard Restructured (v2)** — Rebuilt the Dashboard from scratch as a pure calculation engine. Hero section moved to top, Ghost Money columns removed, all formulas migrated to reference MasterLog exclusively (no more HUDLogs references in Dashboard). Time Machine selectors (M11=Month, N11=Year for MTD; N34=Year for YTD) now correctly wire both Month and Year — previous version ignored Y1/N11 and hardcoded YEAR(TODAY()) inside formulas.
+- **Category System Finalized and Hardcoded** — Categories locked to 14 final entries. `Home Projects` renamed to `Overheads`. `Mandate` removed. Categories are now served directly from `DEFAULT_CATEGORIES` in Code.gs and are no longer read from HUDSettings. HUDSettings retains only the Accounts column.
+- **BudgetGroups Named and Finalized** — Five budget groups: Survival (Groceries, Transport, Utilities, Health, Education), Wealth (Investments), Wants (Dining & Lifestyle, Relationships, Vice), OneOff (Overheads), Nonspend (Escrow/Lending, Transfer (Self), Adjustment, Income).
+- **ICONS map synced to final 14 categories** — Removed `HOME` (Home Projects) and `MAN` (Mandate), added `OVH` (Overheads).
+- **Ghost Money migrated from Sheet to HUD** — Columns C and D (Actual Balance, Ghost Money) removed from Dashboard permanently. Reconciliation is now an ephemeral HUD calculation, not a stored spreadsheet column.
+- **Vault tab removed** — The personal insurance/policy reference tab was removed from the template as users interact exclusively through the HUD.
+- **Expense by Month QUERY updated** — Migrated from HUDLogs to MasterLog. Exclusion list updated to use `Overheads` instead of `Home Projects`.
+- **Runway formula tightened** — Simplified from a 6-cell chain to a 2-cell calculation. Monthly Survival Burn is a rolling YTD average (total Survival spend ÷ months elapsed).
+- **MTD formulas use date-bounding** — Replaced slow `MONTH(A:A)=X` pattern with fast `DATE(Y,M,1)` to `EOMONTH(DATE(Y,M,1),0)` bounding. Bucket totals use FILTER+REGEXMATCH for multi-category grouping; single-category Wealth bucket uses faster SUMIFS.
+
+### Fixed
+
+- **Account balances showing ₹0 in HUD** — `getSnapshot` was reading column C (row index 1) for account balances, but Ghost Money column removal shifted the balance to column D (row index 2). Fixed index to `row[2]`.
+- **YTD description formula ignoring year selector** — All YTD TEXTJOIN/QUERY description formulas had `YEAR(TODAY())` hardcoded instead of referencing `$N$34`. Fixed to use the selector cell.
+- **MTD description formula ignoring year selector** — Same issue in MTD board; fixed to reference `$N$11`.
+- **Expense by Month formula** — Was referencing `HUDLogs` directly. Migrated to `MasterLog` with corrected exclusion list.
+
 ## [2026-08-02]
 
 ### Fixed
